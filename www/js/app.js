@@ -1,6 +1,10 @@
 var myproject = angular.module('starter', ['ionic']);
 
-
+/*
+//Pouch DB
+var dbpostings = new PouchDB('postings');
+var remoteCouch = 'http://localhost:5984/dbpostings';
+*/
 
 .run(function($ionicPlatform) {
   $ionicPlatform.ready(function() {
@@ -58,6 +62,7 @@ myproject.controller('MapController', function($scope) {
 
 
 /*
+
 function addMarker(location, map) {
   // Add the marker at the clicked location
   // Reference https://developers.google.com/maps/documentation/javascript/markers#add
@@ -68,15 +73,14 @@ function addMarker(location, map) {
   });
 }
 
-	//if Submit button is clicked, run this function to get all data into PouchDB database
-
+//if Submit button is clicked, run this function to get all data into PouchDB database
 function addaPosting() {
   window.alert('Button was clicked!');
 
   dbpostings.put(posting, function callback(err, result) {
-	if (!err) {
-	  console.log('Success');
-	}
+    if (!err) {
+      console.log('Success');
+    }
   });
 }
 
@@ -87,7 +91,6 @@ function syncError() {
 function sync() {
   var opts = {live: true};
   dbpostings.sync(remoteCouch, opts, syncError);
-
 }
 
 
@@ -97,10 +100,7 @@ if(remoteCouch) {
 }
 */
 
-/*
-var dbpostings = new PouchDB('postings');
-var remoteCouch = 'http://localhost:5984/dbpostings';
-*/
+
 /*
 var posting = {
 _id: new Date().toISOString(),
