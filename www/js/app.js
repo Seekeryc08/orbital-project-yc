@@ -1,12 +1,7 @@
-var myproject = angular.module('starter', ['ionic']);
+var myApp = angular.module('starter', ['ionic']);
+var y=1;
 
-/*
-//Pouch DB
-var dbpostings = new PouchDB('postings');
-var remoteCouch = 'http://localhost:5984/dbpostings';
-*/
-
-.run(function($ionicPlatform) {
+myApp.run(function($ionicPlatform) {
   $ionicPlatform.ready(function() {
     if(window.cordova && window.cordova.plugins.Keyboard) {
       // Hide the accessory bar by default (remove this to show the accessory bar above the keyboard
@@ -24,55 +19,124 @@ var remoteCouch = 'http://localhost:5984/dbpostings';
   });
 })
 
-myproject.controller('MapController', function($scope) {
 
+
+function onload() {
+  document.addEventListener("deviceready", onDeviceReady, false);
+}
+
+function onDeviceReady() {
+  alert("hi");
+}
+
+
+/* The Cordova Geolocation Plugin API is based on the W3C Geolocation API Specification, and only executes on devices that don't already provide an implementation.
+https://www.npmjs.com/package/cordova-plugin-geolocation
+*/
+
+//Can't get inside function myApp.controller('MapController', function($scope, $cordovaGeolocation){
+myApp.controller('MapController', function($scope) {
+
+  /* http://www.joshmorony.com/integrating-google-maps-with-an-ionic-application/
+
+  var options = {timeout: 10000, enableHighAccuracy: true};
+
+  $cordovaGeolocation.getCurrentPosition(options).then(function(position){
+
+    var latLng = new google.maps.LatLng(position.coords.latitude, position.coords.longitude);
+    var mapOptions = {
+      center: latLng,
+      zoom: 15,
+      mapTypeId: google.maps.MapTypeId.ROADMAP
+    };
+    $scope.map = new google.maps.Map(document.getElementById("map"), mapOptions);
+  }, function(error){
+      alert("Could not get location");
+  });
+  */
+
+
+    //what is dom listener load
     google.maps.event.addDomListener(window, 'load', function() {
 
-        var myLatlng = new google.maps.LatLng(37.3000, -120.4833);
+        document.getElementById("cres").innerHTML = "para changed";
 
+        var myLatlng = new google.maps.LatLng(37.3000, -120.4833);
         var mapOptions = {
             center: myLatlng,
             zoom: 16,
             mapTypeId: google.maps.MapTypeId.ROADMAP
         };
-
         var map = new google.maps.Map(document.getElementById("map"), mapOptions);
-
-        navigator.geolocation.getCurrentPosition(function(pos) {
-            map.setCenter(new google.maps.LatLng(pos.coords.latitude, pos.coords.longitude));
-            var myLocation = new google.maps.Marker({
-                position: new google.maps.LatLng(pos.coords.latitude, pos.coords.longitude),
-                map: map,
-                title: "My Location"
-            });
-        });
-
         $scope.map = map;
-/*
+        //ALL WORKING FINE UP TILL HERE
+
+        //GET USER's LOCATION
+        var onSuccess = function(position) {
+
+          alert('Latitude: '+ position.coords.latitude + '\n'
+              + 'Longitude: '+ position.coords.longitude);
+              //geolocation working on my browser but NOT ON MY DEVICE; lat/lng is wrong!
+
+          map.setCenter(new google.maps.LatLng(position.coords.latitude, position.coords.longitude));
+          var myLocation = new google.maps.Marker({
+              position: new google.maps.LatLng(position.coords.latitude, position.coords.longitude),
+              map: map,
+              title: "My Location"
+          });
+
+        };
+
+        function onError(error) {
+            alert('code: '    + error.code    + '\n' +
+                  'message: ' + error.message + '\n');
+        }
+
+        //UNABLE TO GET USER'S LOCATION ON DEVICE
+        navigator.geolocation.getCurrentPosition(onSuccess, onError); //onSuccess callback runs!
+
+
+
+
+  /*
         // This event listener calls addMarker() when the map is clicked.
         google.maps.event.addListener(map, 'click', function(event) {
           addMarker(event.latLng, map);
-          posting.location = event.latLng;
+          //posting.location = event.latLng;
         });
         // I need to get event.latLng into my database
-*/
+
+  */
+
     });
+
 
 });
 
+/*
+  function addMarker(location, map) {
+    // Add the marker at the clicked location
+    // Reference https://developers.google.com/maps/documentation/javascript/markers#add
+    var marker = new google.maps.Marker({
+      position: location,
+      animation: google.maps.Animation.DROP,
+      map: map
+    });
+  }
+*/
+
+
+
+
+
+
+
+
+
+
+/*ON POUCHDB*/
 
 /*
-
-function addMarker(location, map) {
-  // Add the marker at the clicked location
-  // Reference https://developers.google.com/maps/documentation/javascript/markers#add
-  var marker = new google.maps.Marker({
-    position: location,
-    animation: google.maps.Animation.DROP,
-    map: map
-  });
-}
-
 //if Submit button is clicked, run this function to get all data into PouchDB database
 function addaPosting() {
   window.alert('Button was clicked!');
