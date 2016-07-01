@@ -77,6 +77,8 @@ myApp.controller('MapController', function($scope) {
           alert('Latitude: '+ position.coords.latitude + '\n'
               + 'Longitude: '+ position.coords.longitude);
               //geolocation working on my browser but NOT ON MY DEVICE; lat/lng is wrong!
+              //what is displaying is the custom location that I set for my iOS simulator, not my current location
+              //similarly, on android simulator, what is displaying is the location I ran geo fix, not my current location
 
           map.setCenter(new google.maps.LatLng(position.coords.latitude, position.coords.longitude));
           var myLocation = new google.maps.Marker({
@@ -93,8 +95,11 @@ myApp.controller('MapController', function($scope) {
         }
 
         //UNABLE TO GET USER'S LOCATION ON DEVICE
-        navigator.geolocation.getCurrentPosition(onSuccess, onError); //onSuccess callback runs!
-
+        var options = {maximumAge: 0, timeout: 10000, enableHighAccuracy:true};
+        navigator.geolocation.getCurrentPosition(onSuccess, onError, options);
+        /*http://www.tutorialspoint.com/android/android_emulator.htm*/
+        /*http://stackoverflow.com/questions/16262878/phonegap-geolocation-code-3-timeout-expired-keeps-popping-up-on-some-android*/
+        //http://stackoverflow.com/questions/4169061/android-emulator-having-issues-with-geolocation
 
 
 
