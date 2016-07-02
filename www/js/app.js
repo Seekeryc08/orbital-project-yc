@@ -1,4 +1,4 @@
-var myApp = angular.module('starter', ['ionic']);
+var myMain = angular.module('starter', ['ionic']);
 var y=1;
 
 myApp.run(function($ionicPlatform) {
@@ -35,7 +35,7 @@ https://www.npmjs.com/package/cordova-plugin-geolocation
 */
 
 //Can't get inside function myApp.controller('MapController', function($scope, $cordovaGeolocation){
-myApp.controller('MapController', function($scope) {
+myMain.controller('MapController', function($scope) {
 
   /* http://www.joshmorony.com/integrating-google-maps-with-an-ionic-application/
 

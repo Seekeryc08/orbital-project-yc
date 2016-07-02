@@ -14,7 +14,6 @@
 
     <!-- ionic/angularjs js -->
     <script src="lib/ionic/js/ionic.bundle.js"></script>
-
     <script src="http://maps.googleapis.com/maps/api/js?key=AIzaSyA2u0eQNzCuDMdzG4opRM1ELacupQbzX28&sensor=true"></script>
 
     <!-- your app's js -->
@@ -24,18 +23,37 @@
 
   </head>
 
-  <body onload="onload()" ng-app="starter">
-  <!--maybe cannot put onload and ng-app together-->
+  <body>
 
     <ion-pane>
-      <ion-header-bar class="bar-stable">
-        <h1 class="title">Ionic Blank Starter</h1>
-      </ion-header-bar>
+      <h1>GoldOld</h1>
+      <p>{ { The platform that connects } }</p>
 
       <ion-content>
-        <div id="cres"></div>
 
-        <div ng-controller="MapController" id="map" data-tap-disabled="true"></div>
+        <form>
+
+          <h3>Log In</h3>
+
+          <div class="list">
+            <label class="item item-input">
+              <span class="input-label">Username</span>
+              <input id="username" type="text">
+            </label>
+            <label class="item item-input">
+              <span class="input-label">Password</span>
+              <input type="password">
+            </label>
+          </div>
+
+          <button id="submit_me" class="button button-positive"><a href="main.html">
+            Submit
+            </a>
+          </button>
+        </form>
+        <a href="main.html">Go to home page</a>
+        <a href="signup-user.html"><p text-align="right">Sign Up</p></a>
+        <a href="org/login-org.html"><p text-align="right">Log In As An Admin</p></a>
 
       </ion-content>
 
