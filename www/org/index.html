@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=no, width=device-width">
+    <title></title>
+
+    <link href="../lib/ionic/css/ionic.css" rel="stylesheet">
+    <link href="../css/style.css" rel="stylesheet">
+
+    <!-- IF using Sass (run gulp sass first), then uncomment below and remove the CSS includes above
+    <link href="css/ionic.app.css" rel="stylesheet">
+    -->
+
+    <!-- ionic/angularjs js -->
+    <script src="../lib/ionic/js/ionic.bundle.js"></script>
+
+    <!-- your app's js -->
+    <script src="../js/app.js"></script>
+    <!-- cordova script (this will be a 404 during development) -->
+    <script src="cordova.js"></script>
+
+  </head>
+
+  <body>
+
+    <ion-pane>
+		<div class="bar bar-header">
+		  <button class="button button-icon icon ion-navicon"></button>
+		  <div class="h1 title">Home</div>
+		  <a class="button button-icon icon ion-settings" href="profile-org.html"></a>
+		</div>
+
+      <ion-content>
+      	<p>Welcome, {{ name_of_org }}</p>
+      	<img>
+      	<a href="new-post.html"><div>Post a new opportunity</div></a>
+
+		<!--use the ng-repeat -->
+		<!--show max 10 posts on one pg-->
+		<ul class="list">
+			<li class="item">
+			  <h3>{ { title }} </h3>
+			  <div> { { latest update } }</div>
+			  <div>{ { details } }</div>
+			  <div><a href="">more..</a></div>
+				<button class="button">Edit</button>
+				<button class="button button-balanced">Applications Received (4)</button>
+				<button class="button button-assertive">
+				  Close this post
+				</button>
+			  <div></div>
+
+			</li>
+			<li class="item">
+			  <h3>{ { title }} </h3>
+			  <div> { { latest update } }</div>
+			  <div>{ { details } }</div>
+			  <div><a href="">more..</a></div>
+				<button class="button">Edit</button>
+				<button class="button button-balanced">Applications Received (1)</button>
+				<button class="button button-assertive">
+				  Close this post
+				</button>
+			  <div></div>
+
+			</li>
+			<li class="item">
+			  ...
+			</li>
+		</ul>
+    <a href="../index.html">back to index</a>
+
+      </ion-content>
+
+
+		<div class="bar bar-footer">
+		  <button class="button button-clear">Left</button>
+		  <div class="title">View Past Posts: Closed (12)</div>
+		  <button class="button button-clear">Right</button>
+		</div>
+
+    </ion-pane>
+
+  </body>
+</html>
+
