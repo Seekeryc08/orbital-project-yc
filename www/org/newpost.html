@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html ng-app="newpost">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=no, width=device-width">
+    <title></title>
+
+    <link href="../lib/ionic/css/ionic.css" rel="stylesheet">
+    <link href="../css/style.css" rel="stylesheet">
+
+    <!-- IF using Sass (run gulp sass first), then uncomment below and remove the CSS includes above
+    <link href="css/ionic.app.css" rel="stylesheet">
+    -->
+
+    <!-- ionic/angularjs js -->
+    <script src="../lib/ionic/js/ionic.bundle.js"></script>
+    <script src="http://maps.googleapis.com/maps/api/js?key=AIzaSyA2u0eQNzCuDMdzG4opRM1ELacupQbzX28&sensor=true"></script>
+
+    <script src="../app.module.js"></script>
+
+    <script src="../lib/pouchdb/dist/pouchdb.min.js"></script>
+
+    <!-- your app's js -->
+    <script src="newpost/newpost.module.js"></script>
+    <!-- cordova script (this will be a 404 during development) -->
+    <script src="cordova.js"></script>
+
+  </head>
+
+  <body>
+
+		<div class="bar bar-header">
+<!--
+		  <a class="button icon-left ion-chevron-left button-clear button-dark">Back</a>
+-->
+		  <div class="h1 title">Add New</div>
+
+			<a href="index.html"><button class="button icon-right ion-home ion-right">Home</button></a>
+
+		</div>
+      <ion-content>
+        <div class="padding-separate"></div>
+
+        <div ng-controller="MapOrgController" id="map" data-tap-disabled="true"></div>
+
+        <form ng-controller="myForm" id="postingForm">
+
+          <div class="list">
+              <label class="item item-input">
+                <span class="input-label">Title</span>
+                <input name="title" id="title" type="text">
+              </label>
+              <label class="item item-input">
+                <span class="input-label">Skills</span>
+                <input name="skills" id="" type="text">
+              </label>
+              <label class="item item-input">
+                <span class="input-label">Address</span>
+                <input name="address" id="" type="text">
+              </label>
+              <label class="item item-input">
+                <span class="input-label">Pos. latLng</span>
+                <input name="latlng" id="" type="text">
+              </label>
+
+              <!--use datepicker-->
+              <label class="item item-input">
+                <span class="input-label">Date and Time</span>
+                <input name="datetime" id="" type="text">
+              </label>
+
+              <label class="item item-input item-select">
+              <div class="input-label">
+                Type
+              </div>
+              <select name="type">
+                <option>Work</option>
+                <option selected>Volunteer</option>
+              </select>
+              </label>
+
+              <label class="item item-input item-stacked-label">
+                <span class="input-label">Description</span>
+                  <textarea name="description" placeholder="Tell the user more information about this opportunity"></textarea>
+              </label>
+
+              <!--after this deadline, this post will be auto removed from the database that displays the work/vol info/opportunities-->
+
+              <label class="item item-input">
+                <span class="input-label">Deadline</span>
+                <input name="deadline" id="" type="text">
+              </label>
+
+              <label class="item item-input item-select">
+                <div class="input-label">
+                  Do you want users to apply through the app?
+                </div>
+                <select id="application" name="application" onchange="showOrHideOptions()">
+                  <option>No</option>
+                  <option selected>Yes</option>
+                </select>
+              </label>
+
+              <!--if yes-->
+              <div id="optionalApplication">
+                <div class="row">
+                  <div class="col">
+                    Select the text fields that you want the applicant to fill up.
+                  </div>
+                </div>
+
+                <!--CHECKBOX NOT WORKING-->
+                <ion-list>
+                  <ion-checkbox ng-model="checkboxModel.value1">Q1</ion-checkbox>
+                  <ion-checkbox ng-model="checkboxModel.value2">Q2</ion-checkbox>
+                  <ion-checkbox ng-model="checkboxModel.value3">Q3</ion-checkbox>
+                </ion-list>
+                </div>
+              </div>
+
+              <!-- Provide customised options to ask more questions-->
+              <div class="row">
+                <div class="col">
+                  <div id="debug"></div>
+                </div>
+              </div>
+
+              <div class="row">
+                <div class="col text-center">
+                  <button id="" class="button button-positive">Submit</button>
+                </div>
+              </div>
+            </div>
+        </form>
+
+		    <a href="index.html">Take me to org main page</a>
+
+
+      </ion-content>
+
+
+    <script>
+      var dbpostings = new PouchDB('postings');
+      var remoteCouch = "http://localhost:5984/postings";
+
+      function showOrHideOptions() {
+        if(document.getElementById("application").selectedIndex == "1") {
+          //alert("hey");
+          document.getElementById("optionalApplication").style.display = "block";
+        } else if(document.getElementById("application").selectedIndex == "0"){
+          document.getElementById("optionalApplication").style.display = "none";
+        }
+      }
+
+      var postingForm, addPost;
+
+      postingForm = document.getElementById('postingForm');
+      addPost = function(event) {
+        var newPost = {};
+
+        newPost._id = new Date().toISOString();
+        //name of org newPost.orgName = { { profile registered name? } }
+        newPost.title = postingForm.title.value;
+        newPost.skills = postingForm.skills.value;
+        newPost.address = postingForm.address.value;
+        newPost.latlng = postingForm.latlng.value;
+        newPost.datetime = postingForm.datetime.value;
+        newPost.type = postingForm.type.value;
+        newPost.description = postingForm.description.value;
+        newPost.deadline = postingForm.deadline.value;
+        newPost.application = postingForm.application.value;
+
+        dbpostings.put(newPost, function(error, response) {
+          if (!error) {
+            alert("post added");
+            console.log('Added a new post');
+          }
+        });
+
+        function syncError() {
+            alert("Unable to sync to remote");
+
+            console.log('Unable to sync to remote');
+        }
+
+        function sync() {
+          var opts = {live: true};
+          dbpostings.sync(remoteCouch, opts, syncError);
+        }
+
+        if(remoteCouch) {
+          sync();
+        }
+
+      }
+
+      if(postingForm) {
+        document.getElementById("debug").innerHTML = "changed";
+        postingForm.addEventListener('submit', addPost);
+        //NOTE: ON CLICK, HIDE FORM, SHOW NOTICE THAT POST HAS BEEN ADDED AND PROVIDE A BUTTON TO TAKE THEM BACK TO HOME PG
+      }
+
+//FOR MAIN.HTML
+      function nextFunction(x) {
+        x.forEach(function(y) {
+          thirdFunction(y.doc);
+        });
+      }
+
+      function thirdFunction(z) {
+        alert(z.title + z.latlng + z.type + z.application);
+      }
+
+      dbpostings.allDocs({include_docs: true, descending: true}).then(function (doc) {
+        //alert(JSON.stringify(doc.rows));
+        nextFunction(doc.rows);
+
+      }).catch(function(err){
+        console.log(err);
+      });
+
+
+    </script>
+
+  </body>
+</html>
+
+
