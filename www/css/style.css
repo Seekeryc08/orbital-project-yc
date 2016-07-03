@@ -5,5 +5,31 @@
 
 #map {
     width: 100%;
-    height: 70%;
+    height: 50%;
+}
+
+.appname{
+  color:grey;
+  font-size:4em;
+  padding-top:30px;
+}
+
+.padding-separate{
+  padding:30px 0;
+}
+
+.home-description{
+  padding: 30px;
+}
+
+.title-index{
+  font-size:1.5em;
+}
+
+#welcome-org{
+  font-size:1.2em;
+}
+
+a {
+  text-decoration:none;
 }

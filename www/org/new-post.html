@@ -22,13 +22,13 @@
 
   </head>
 
-  <body>
+  <body ng-app="newpost">
 
     <ion-pane>
 		<div class="bar bar-header">
-
+<!--
 		  <a class="button icon-left ion-chevron-left button-clear button-dark">Back</a>
-
+-->
 		  <div class="h1 title">Add New</div>
 
 			<a href="index.html"><button class="button icon-right ion-home ion-right">Home</button></a>
@@ -36,7 +36,7 @@
 		</div>
       <ion-content>
 
-        <form>
+        <form ng-controller="myform">
 
           <div class="list">
             <label class="item item-input">
@@ -65,26 +65,25 @@
               <input id="" type="text">
             </label>
 
-			  <label class="item item-input item-select">
-				<div class="input-label">
-				  Type
-				</div>
-				<select>
-				  <option>Work</option>
-				  <option selected>Volunteer</option>
-				</select>
-			  </label>
-
-            <label class="item item-input">
-              <textarea placeholder="Tell the user more information about this opportunity"></textarea>
+            <label class="item item-input item-select">
+            <div class="input-label">
+              Type
+            </div>
+            <select>
+              <option>Work</option>
+              <option selected>Volunteer</option>
+            </select>
             </label>
-          </div>
 
-			<!--after this deadline, this post will be auto removed from the database that displays the work/vol info/opportunities-->
+            <label class="item item-input item-stacked-label">
+            	<span class="input-label">Description</span>
+              	<textarea placeholder="Tell the user more information about this opportunity"></textarea>
+            </label>
 
+			      <!--after this deadline, this post will be auto removed from the database that displays the work/vol info/opportunities-->
             <label class="item item-input">
               <span class="input-label">Deadline</span>
-              <input id="" type="text">
+              <input id="" type="text">{use datepicker}
             </label>
 
 			  <label class="item item-input item-select">
@@ -98,27 +97,44 @@
 			  </label>
 
 			  <!--if yes-->
-			  <div>Select the text fields that you want the applicant to fill up.</div>
-<ion-list>
+			  <div class="row">
+			    <div class="col">
+			      Select the text fields that you want the applicant to fill up.
+			    </div>
+        </div>
 
-  <ion-checkbox ng-model="filter.red">Q1</ion-checkbox>
-  <ion-checkbox ng-model="filter.yellow">Q2</ion-checkbox>
-  <ion-checkbox ng-model="filter.pink">Q3</ion-checkbox>
-
-</ion-list>
+<!--CHECKBOX NOT WORKING-->
+        <ion-list>
+          <ion-checkbox ng-model="checkboxModel.value1">Q1</ion-checkbox>
+          <ion-checkbox ng-model="checkboxModel.value2">Q2</ion-checkbox>
+          <ion-checkbox ng-model="checkboxModel.value3">Q3</ion-checkbox>
+        </ion-list>
 
 
 				<!-- Provide customised options to ask more questions-->
-
-          <button id="submit_me" class="button button-positive">
-            Submit
-          </button>
+          <div class="row">
+            <div class="col text-center">
+              <button id="" class="button button-positive">Enter</button>
+            </div>
+          </div>
         </form>
 		<a href="index.html">Take me to org main page</a>
 
       </ion-content>
 
     </ion-pane>
+
+    <script>
+    angular.module('newpost', ['ionic'])
+    .controller('myform', ['$scope', function($scope) {
+      $scope.checkboxModel = {
+       value1 : 'Q1',
+       value2 : 'Q2',
+       value2 : 'Q3'
+
+     };
+    }]);
+    </script>
 
   </body>
 </html>
