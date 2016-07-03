@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html ng-app="signup">
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=no, width=device-width">
@@ -17,52 +17,117 @@
 
     <!-- your app's js -->
     <script src="app.module.js"></script>
-    <script src="toggle-project/toggle-project.module.js"></script>
-    <script src="toggle-project/toggle-project.component.js"></script>
+<script src="//cdn.jsdelivr.net/pouchdb/5.4.4/pouchdb.min.js"></script>
+
+    <script src="signup/signup.module.js"></script>
+
     <!-- cordova script (this will be a 404 during development) -->
     <script src="cordova.js"></script>
 
   </head>
 
-  <body ng-app="signup">
+  <body>
 
 					<ion-content>
 
-						<form>
+						<form id="signup-user">
               <div class="row">
                 <div class="col text-center">
                   <h3>Sign Up</h3>
                 </div>
               </div>
 						  <div class="list">
-							<label class="item item-input">
-							  <span class="input-label">Username</span>
-							  <input id="username" type="text">
-							</label>
-							<label class="item item-input">
-							  <span class="input-label">Password</span>
-							  <input type="password">
-							</label>
-							<label class="item item-input">
-							  <span class="input-label">Re-enter Password</span>
-							  <input type="password">
-							</label>
-							<label class="item item-input">
-							  <span class="input-label">Email</span>
-							  <input type="text" placeholder="john@suhr.com">
-							</label>
+                <label class="item item-input">
+                  <span class="input-label">Username</span>
+                  <input name="username" id="username" type="text">
+                </label>
+                <label class="item item-input">
+                  <span class="input-label">Password</span>
+                  <input name="password" type="password">
+                </label>
+                <label class="item item-input">
+                  <span class="input-label">Re-enter Password</span>
+                  <input type="password">
+                </label>
+                <label class="item item-input">
+                  <span class="input-label">Email</span>
+                  <input name="email" type="text" placeholder="john@suhr.com">
+                </label>
 						  </div>
 
               <div class="row">
                 <div class="col text-center">
-                  <button id="" class="button button-positive">Done</button>
+                  <button id="submitNewUser" class="button button-positive">Done</button>
                 </div>
               </div>
 						</form>
 
+              <div class="row">
+                <div class="col text-center">
+                  <p id="para">hello</p>
+                </div>
+              </div>
 						<a href="index.html">back to index</a>
 
 					</ion-content>
+          <script>
+
+              var dbusers = new PouchDB('users');
+              var remoteCouch = "http://localhost:5984/users";
+
+
+              var signUpForm, addUser;
+
+              signUpForm = document.getElementById('signup-user');
+
+              addUser = function(event) {
+                var newUser = {};
+
+                newUser._id = new Date().toISOString();
+                newUser.username = signUpForm.username.value;
+                newUser.password = signUpForm.password.value;
+                newUser.email = signUpForm.email.value;
+
+                dbusers.put(newUser, function(error, response) {
+                  if (!error) {
+                    console.log('Added a new user');
+                  }
+
+                });
+                window.location.href = "main.html";
+
+                //this works
+                //however console outputs "unable to sync to remote"
+                //upon redirection to main.html, able to see data stored on local dbusers database but remote database shows no changes
+                //but upon clicking the back button, remote database updates
+
+
+              }
+
+
+              if(signUpForm) {
+
+                document.getElementById("para").innerHTML = "changed";
+
+                signUpForm.addEventListener('submit', addUser);
+
+              }
+
+              function syncError() {
+                  console.log('Unable to sync to remote');
+              }
+
+              function sync() {
+                var opts = {live: true};
+                dbusers.sync(remoteCouch, opts, syncError);
+                //db.replicate.to(remoteCouch, opts, syncError);
+                //db.replicate.from(remoteCouch, opts, syncError);
+              }
+
+              if(remoteCouch) {
+                sync();
+              }
+          </script>
 
   </body>
 </html>
