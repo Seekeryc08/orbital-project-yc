@@ -1,7 +1,7 @@
-var myApp = angular.module('starter', ['ionic']);
+var myMain = angular.module('starter', ['ionic']);
 var y=1;
 
-myApp.run(function($ionicPlatform) {
+myMain.run(function($ionicPlatform) {
   $ionicPlatform.ready(function() {
     if(window.cordova && window.cordova.plugins.Keyboard) {
       // Hide the accessory bar by default (remove this to show the accessory bar above the keyboard
@@ -35,7 +35,7 @@ https://www.npmjs.com/package/cordova-plugin-geolocation
 */
 
 //Can't get inside function myApp.controller('MapController', function($scope, $cordovaGeolocation){
-myApp.controller('MapController', function($scope) {
+myMain.controller('MapController', function($scope) {
 
   /* http://www.joshmorony.com/integrating-google-maps-with-an-ionic-application/
 
@@ -59,8 +59,6 @@ myApp.controller('MapController', function($scope) {
     //what is dom listener load
     google.maps.event.addDomListener(window, 'load', function() {
 
-        document.getElementById("cres").innerHTML = "para changed";
-
         var myLatlng = new google.maps.LatLng(37.3000, -120.4833);
         var mapOptions = {
             center: myLatlng,
@@ -73,9 +71,10 @@ myApp.controller('MapController', function($scope) {
 
         //GET USER's LOCATION
         var onSuccess = function(position) {
-
+/*
           alert('Latitude: '+ position.coords.latitude + '\n'
               + 'Longitude: '+ position.coords.longitude);
+*/
               //geolocation working on my browser but NOT ON MY DEVICE; lat/lng is wrong!
               //what is displaying is the custom location that I set for my iOS simulator, not my current location
               //similarly, on android simulator, what is displaying is the location I ran geo fix, not my current location
@@ -101,24 +100,37 @@ myApp.controller('MapController', function($scope) {
         /*http://stackoverflow.com/questions/16262878/phonegap-geolocation-code-3-timeout-expired-keeps-popping-up-on-some-android*/
         //http://stackoverflow.com/questions/4169061/android-emulator-having-issues-with-geolocation
 
+        google.maps.event.addListenerOnce($scope.map, 'idle', function(){
 
+          var marker = new google.maps.Marker({
+              map: $scope.map,
+              animation: google.maps.Animation.DROP,
+              position: myLatlng //this will get the location before geolocation kicks in
+          });
 
-  /*
-        // This event listener calls addMarker() when the map is clicked.
-        google.maps.event.addListener(map, 'click', function(event) {
-          addMarker(event.latLng, map);
-          //posting.location = event.latLng;
+          var infoWindow = new google.maps.InfoWindow({
+              content: "Here I am!"
+          });
+
+          //THIS CODE ONLY ALLOWS ONE INFOWINDOW TO POP UP
+          // This event listener calls addMarker() when the map is clicked.
+          google.maps.event.addListener(marker, 'click', function () {
+            //addMarker(event.latLng, map);
+
+            infoWindow.open($scope.map, marker);
+
+            //posting.location = event.latLng;
+          });
+          // I need to get event.latLng into my database
+
         });
-        // I need to get event.latLng into my database
-
-  */
 
     });
 
 
 });
 
-/*
+
   function addMarker(location, map) {
     // Add the marker at the clicked location
     // Reference https://developers.google.com/maps/documentation/javascript/markers#add
@@ -128,13 +140,31 @@ myApp.controller('MapController', function($scope) {
       map: map
     });
   }
-*/
 
 
 
 
 
+myMain.controller('refresher', function($scope, $http) {
+  $scope.doRefresh = function() {
+    $http.get('/new-items')
+     .success(function(newItems) {
+       //$scope.items = newItems;
+     })
+     .finally(function() {
+       // Stop the ion-refresher from spinning
+       $scope.$broadcast('scroll.refreshComplete');
+     });
+  };
+});
 
+myMain.controller('toggleMenu', function($scope, $ionicSideMenuDelegate) {
+
+  $scope.toggleLeftSideMenu = function() {
+    $ionicSideMenuDelegate.toggleLeft();
+  };
+
+})
 
 
 
