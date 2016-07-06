@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html ng-app="newpost">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=no, width=device-width">
+    <title></title>
+
+    <link href="../lib/ionic/css/ionic.css" rel="stylesheet">
+    <link href="../css/style.css" rel="stylesheet">
+
+    <!-- ionic/angularjs js -->
+    <script src="../lib/ionic/js/ionic.bundle.js"></script>
+    <script src="http://maps.googleapis.com/maps/api/js?key=AIzaSyA2u0eQNzCuDMdzG4opRM1ELacupQbzX28&sensor=true"></script>
+
+    <script src="../lib/pouchdb/dist/pouchdb.min.js"></script>
+    <!-- your app's js -->
+    <script src="newpost/newpost.module.js"></script>
+    <!-- cordova script (this will be a 404 during development) -->
+    <script src="cordova.js"></script>
+
+  </head>
+  <style>
+    .blue{
+      color:blue;
+    }
+
+  </style>
+
+  <body onload="onload()">
+
+		<div class="bar bar-header">
+
+		  <div class="h1 title">Add New</div>
+
+			<a href="index.html"><button class="button icon-right ion-home ion-right">Home</button></a>
+
+		</div>
+      <ion-content>
+        <div class="padding-separate"></div>
+
+        <!--NO MAP FOR SUCCESSFUL FORM SUBMISSION-->
+        <div ng-controller="MapController" id="map" data-tap-disabled="true"></div>
+
+        <p id="test_1">bla</p>
+
+        <!--NO ng-controller="myForm" FOR SUCCESSFUL FORM SUBMISSION-->
+        <form id="postingForm">
+
+          <div class="list">
+              <label class="item item-input">
+                <span class="input-label">Title</span>
+                <input name="title" id="title" type="text">
+              </label>
+              <label class="item item-input">
+                <span class="input-label">Skills</span>
+                <input name="skills" id="" type="text">
+              </label>
+              <label class="item item-input">
+                <span class="input-label">Address</span>
+                <input name="address" id="" type="text">
+              </label>
+              <label class="item item-input">
+                <span class="input-label">Pos. latLng</span>
+                <input name="latlng" id="" type="text">
+              </label>
+<!--
+              <!--use datepicker-->
+              <label class="item item-input">
+                <span class="input-label">Date and Time</span>
+                <input name="datetime" id="" type="text">
+              </label>
+
+              <label class="item item-input item-select">
+              <div class="input-label">
+                Type
+              </div>
+              <select name="type">
+                <option>Work</option>
+                <option selected>Volunteer</option>
+              </select>
+              </label>
+
+              <label class="item item-input item-stacked-label">
+                <span class="input-label">Description</span>
+                  <textarea name="description" placeholder="Tell the user more information about this opportunity"></textarea>
+              </label>
+
+              <!--after this deadline, this post will be auto removed from the database that displays the work/vol info/opportunities-->
+
+              <label class="item item-input">
+                <span class="input-label">Deadline</span>
+                <input name="deadline" id="" type="text">
+              </label>
+
+              <label class="item item-input item-select">
+                <div class="input-label">
+                  Do you want users to apply through the app?
+                </div>
+                <select id="application" name="application" onchange="showOrHideOptions()">
+                  <option>No</option>
+                  <option selected>Yes</option>
+                </select>
+              </label>
+
+              <!--if yes-->
+              <div id="optionalApplication">
+                <label class="item item-input item-stacked-label">
+                    Select the text fields that you want the applicant to fill up.
+                </label>
+
+
+                <!--CHECKBOX NOT WORKING-->
+                <ion-list>
+                  <ion-checkbox ng-model="checkboxModel.value1">Q1</ion-checkbox>
+                  <ion-checkbox ng-model="checkboxModel.value2">Q2</ion-checkbox>
+                  <ion-checkbox ng-model="checkboxModel.value3">Q3</ion-checkbox>
+                </ion-list>
+                </div>
+              </div>
+
+              <!-- Provide customised options to ask more questions-->
+
+-->
+              <div class="row">
+                <div class="col text-center">
+                  <button id="" class="button button-positive">Submit</button>
+                </div>
+              </div>
+            </div>
+        </form>
+
+		    <a href="index.html">Take me to org main page</a>
+
+
+        <ion-list id="postDisplay">
+        </ion-list>
+
+      </ion-content>
+
+
+    <script>
+
+var dbpostings = new PouchDB('postings');
+var remoteCouch = "http://localhost:5984/postings";
+var postings;
+postings = document.getElementById('postingForm');
+
+
+addPost = function(event) {
+
+  document.getElementById("test_1").innerHTML = "changed";
+
+  var newPost = {};
+
+  newPost._id = new Date().toISOString();
+  //name of org newPost.orgName = { { profile registered name? } }
+  newPost.title = postings.title.value;
+  newPost.skills = postings.skills.value;
+  newPost.address = postings.address.value;
+  newPost.latlng = postings.latlng.value;
+
+  dbpostings.put(newPost, function(error, response) {
+    if (!error) {
+      alert("post added");
+      console.log('Added a new post');
+    }
+  });
+
+  function syncError() {
+      alert("Unable to sync to remote");
+
+      console.log('Unable to sync to remote');
+  }
+  function sync() {
+    var opts = {live: true};
+    dbpostings.sync(remoteCouch, opts, syncError);
+  }
+  if(remoteCouch) {
+    alert("remote alert");
+    sync();
+  }
+
+}
+
+      if(postings) {
+        postings.addEventListener('submit', addPost);
+        //NOTE: ON CLICK, HIDE FORM, SHOW NOTICE THAT POST HAS BEEN ADDED AND PROVIDE A BUTTON TO TAKE THEM BACK TO HOME PG
+
+      }
+
+
+
+//FOR MAIN.HTML
+
+
+      function displayIndividualPosts(x) {
+        var ul = document.getElementById("postDisplay");
+        x.forEach(function(y) {
+          ul.appendChild(createPost(y.doc));
+        });
+      }
+
+      /*
+      function createPost(z) {
+        //alert(z.title + z.latlng + z.type);
+        var li = document.createElement("li");
+        var header = document.createElement("h3");
+        var paragraph = document.createElement("p");
+        var span = document.createElement("span");
+        var divDisplay = document.createElement("div");
+        li.appendChild(header);
+        li.appendChild(divDisplay);
+        header.appendChild(document.createTextNode(z.title));
+        //for loop
+        divDisplay.appendChild(paragraph);
+        divDisplay.appendChild(span);
+        divDisplay.appendChild(paragraph);
+        paragraph.appendChild(document.createTextNode(z.skills));
+        span.appendChild(document.createTextNode(z.address));
+        paragraph.appendChild(document.createTextNode(z.latlng));
+
+        return li;
+      }
+      */
+
+      function createPost(z) {
+        var li = document.createElement("ion-item");
+        var header = document.createElement("h3");
+        var paragraph = document.createElement("p");
+        paragraph.className = "blue"; //http://stackoverflow.com/questions/1115310/how-to-add-a-class-to-dom-element-in-javascript
+        var span = document.createElement("span");
+          //clickable
+          var a = document.createElement('a');
+          var linkText = document.createTextNode("SEE MORE");
+          a.appendChild(linkText);
+          a.href = "newpost/post.html";
+        var divDisplay = document.createElement("div");
+        li.appendChild(header);
+        li.appendChild(divDisplay);
+        header.appendChild(document.createTextNode(z.title));
+        //for loop
+        divDisplay.appendChild(paragraph);
+        divDisplay.appendChild(span);
+        divDisplay.appendChild(paragraph);
+        divDisplay.appendChild(a);
+        paragraph.appendChild(document.createTextNode(z.skills));
+        span.appendChild(document.createTextNode(z.address));
+        paragraph.appendChild(document.createTextNode(z.latlng));
+
+        return li;
+      }
+
+
+
+
+      function displayAllPosts() {
+
+        dbpostings.allDocs({include_docs: true, descending: true}).then(function (doc) {
+          //alert(JSON.stringify(doc.rows));
+          alert('yes');
+          displayIndividualPosts(doc.rows);
+
+        }).catch(function(err){
+          console.log(err);
+        });
+
+      }
+
+      displayAllPosts();
+
+
+    </script>
+
+  </body>
+</html>
+
+
