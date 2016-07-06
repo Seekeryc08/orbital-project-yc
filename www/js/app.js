@@ -169,42 +169,5 @@ myMain.controller('toggleMenu', function($scope, $ionicSideMenuDelegate) {
 
 
 
-/*ON POUCHDB*/
 
-/*
-//if Submit button is clicked, run this function to get all data into PouchDB database
-function addaPosting() {
-  window.alert('Button was clicked!');
-
-  dbpostings.put(posting, function callback(err, result) {
-    if (!err) {
-      console.log('Success');
-    }
-  });
-}
-
-function syncError() {
-}
-
-// Initialise a sync with the remote server
-function sync() {
-  var opts = {live: true};
-  dbpostings.sync(remoteCouch, opts, syncError);
-}
-
-
-if(remoteCouch) {
-  document.getElementById("para").innerHTML = "changed";
-  sync();
-}
-*/
-
-
-/*
-var posting = {
-_id: new Date().toISOString(),
-location: "",
-sample: true
-//all other data from S.E. form here
-};
-*/
+document.getElementById('why').innerHTML = 'works';

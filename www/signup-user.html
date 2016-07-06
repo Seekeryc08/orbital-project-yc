@@ -17,7 +17,7 @@
 
     <!-- your app's js -->
     <script src="app.module.js"></script>
-<script src="//cdn.jsdelivr.net/pouchdb/5.4.4/pouchdb.min.js"></script>
+    <script src="lib/pouchdb/dist/pouchdb.min.js"></script>
 
     <script src="signup/signup.module.js"></script>
 
@@ -74,12 +74,9 @@
 
               var dbusers = new PouchDB('users');
               var remoteCouch = "http://localhost:5984/users";
-
-
               var signUpForm, addUser;
 
               signUpForm = document.getElementById('signup-user');
-
               addUser = function(event) {
                 var newUser = {};
 
@@ -93,40 +90,45 @@
                     console.log('Added a new user');
                   }
 
+
                 });
-                window.location.href = "main.html";
+/*
+                .then(function redirect() {
+                  window.location="main.html";
+                });
+*/
+                //window.location.href = "main.html";
+                //window.location.replace("main.html");
 
                 //this works
                 //however console outputs "unable to sync to remote"
                 //upon redirection to main.html, able to see data stored on local dbusers database but remote database shows no changes
                 //but upon clicking the back button, remote database updates
 
+                function syncError() {
+                    console.log('Unable to sync to remote');
+                }
 
+                function sync() {
+                  var opts = {live: true};
+                  if(dbusers.sync(remoteCouch, opts, syncError)) {
+                    //alert("no error");
+                    window.location.href = "main.html";
+                  }
+                }
+
+                if(remoteCouch) {
+                  sync();
+                }
               }
 
 
               if(signUpForm) {
-
                 document.getElementById("para").innerHTML = "changed";
-
                 signUpForm.addEventListener('submit', addUser);
-
               }
 
-              function syncError() {
-                  console.log('Unable to sync to remote');
-              }
 
-              function sync() {
-                var opts = {live: true};
-                dbusers.sync(remoteCouch, opts, syncError);
-                //db.replicate.to(remoteCouch, opts, syncError);
-                //db.replicate.from(remoteCouch, opts, syncError);
-              }
-
-              if(remoteCouch) {
-                sync();
-              }
           </script>
 
   </body>

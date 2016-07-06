@@ -1,8 +1,5 @@
-'use strict';
 
 // Define the `signup` module
-angular.module('signup', [
+angular.module('signup', ['ionic']);
 
-	// ...which depends on the `toggleProject` module
-	'toggleProject'
-]);
+//angular.module('newpost', ['ionic']);
