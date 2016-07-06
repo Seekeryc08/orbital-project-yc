@@ -1,16 +1,47 @@
-(function() {
+var newPostApp = angular.module('newpost', ['ionic']);
 
-'use strict';
-    angular.module('newpost', ['ionic']).controller('myForm', ['$scope', function($scope) {
-		$scope.checkboxModel = {
-			value1 : 'Q1',
-			value2 : 'Q2',
-			value2 : 'Q3'
-		};
-    }]);
+newPostApp.run(function($ionicPlatform) {
+  $ionicPlatform.ready(function() {
+    if(window.cordova && window.cordova.plugins.Keyboard) {
+      // Hide the accessory bar by default (remove this to show the accessory bar above the keyboard
+      // for form inputs)
+      cordova.plugins.Keyboard.hideKeyboardAccessoryBar(true);
+
+      // Don't remove this line unless you know what you are doing. It stops the viewport
+      // from snapping when text inputs are focused. Ionic handles this internally for
+      // a much nicer keyboard experience.
+      cordova.plugins.Keyboard.disableScroll(true);
+    }
+    if(window.StatusBar) {
+      StatusBar.styleDefault();
+    }
+  });
+})
+
+function onDeviceReady() {
+            alert("hi");
+}
 
 
-	angular.module('newpost', ['ionic']).controller('MapOrgController', function($scope) {
+function onload() {
+  document.addEventListener("deviceready", onDeviceReady, false);
+
+}
+
+
+
+
+
+
+
+
+
+/* IF I COMMENT MY MAP CONTROLLER FUNCTION OUT, THE SUBMIT EVENT WORKS (http://localhost:8100/org/newpost.html?title=woo&skills=&address=&latlng=&datetime=&type=Volunteer&description=&deadline=&application=Yes)
+                                              , BUT DATA DOES NOT GET STORED IN ANY DATABASE.
+
+*/
+newPostApp.controller('MapController', function($scope) {
+
 
 		google.maps.event.addDomListener(window, 'load', function() {
 
@@ -28,13 +59,7 @@
 
 			var onSuccess = function(position) {
 			  map.setCenter(new google.maps.LatLng(position.coords.latitude, position.coords.longitude));
-/*
-			  var myLocation = new google.maps.Marker({
-				  position: new google.maps.LatLng(position.coords.latitude, position.coords.longitude),
-				  map: map,
-				  title: "My Location"
-			  });
-*/
+
 			};
 
 			function onError(error) {
@@ -62,17 +87,54 @@
 				//Convert marker into address
 				//https://developers.google.com/maps/documentation/javascript/geocoding#quotas
 				//alert("" + event.formatted_address + "");
-				postingForm.latlng.value = event.latLng;
+				document.getElementById('postingForm').latlng.value = event.latLng;
 			});
 			//posting.location = event.latLng;
 			// I need to get event.latLng into my database
 
 		});
 
-	});
+
+});
 
 
 
 
 
-})();
+
+
+/*
+    newPostApp.controller('myForm', ['$scope', function($scope) {
+      $scope.checkboxModel = {
+        value1 : 'Q1',
+        value2 : 'Q2',
+        value2 : 'Q3'
+      };
+    }]);
+*/
+
+
+/* IF I PUT THIS ABOVE, MY MAP DISAPPEARS
+
+      if(postings) {
+
+        document.getElementById("test_1").innerHTML = "changed";
+        document.getElementById('postingForm').addEventListener('submit', addPost);
+        //NOTE: ON CLICK, HIDE FORM, SHOW NOTICE THAT POST HAS BEEN ADDED AND PROVIDE A BUTTON TO TAKE THEM BACK TO HOME PG
+
+      }
+*/
+
+
+//ERROR: console says showOrHideOptions() is NOT DEFINED
+/*
+      function showOrHideOptions() {
+        if(document.getElementById("application").selectedIndex == "1") {
+          //alert("hey");
+          document.getElementById("optionalApplication").style.display = "block";
+        } else if(document.getElementById("application").selectedIndex == "0"){
+          document.getElementById("optionalApplication").style.display = "none";
+        }
+      }
+*/
+
