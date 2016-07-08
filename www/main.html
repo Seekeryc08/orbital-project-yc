@@ -14,6 +14,7 @@
 
     <!-- ionic/angularjs js -->
     <script src="lib/ionic/js/ionic.bundle.js"></script>
+    <script src="lib/pouchdb/dist/pouchdb.min.js"></script>
 
     <script src="http://maps.googleapis.com/maps/api/js?key=AIzaSyA2u0eQNzCuDMdzG4opRM1ELacupQbzX28&sensor=true"></script>
 
@@ -46,10 +47,13 @@
 
             </div>
           </div>
-          					<a href="index.html">back to index</a>
-          <ul id="postsDisplay" class="list">
+
+          <ul id="postDisplay">
 
           </ul>
+
+          <div class="padding-separate"></div>
+          <a href="index.html">back to index</a>
 <!--
           <ion-list>
             <ion-item>
@@ -77,13 +81,6 @@
                 <div class="row">
                   <div class="col">
                       <div>details fetched from database details fetched from database details fetched from database details fetched from database </div>
-                  </div>
-                </div>
-
-                <div class="row">
-                  <div class="col">
-                    <!--restrict no. of columns to display for details -->
-                    <div><a href="">more..</a></div>
                   </div>
                 </div>
 
@@ -132,7 +129,89 @@
 
     <script>
 
+      var dbpostings = new PouchDB('postings');
+      var remoteCouch = "http://localhost:5984/postings";
 
+//FOR MAIN.HTML
+
+
+      function displayIndividualPosts(x) {
+        var ul = document.getElementById("postDisplay");
+        x.forEach(function(y) {
+          ul.appendChild(createPost(y.doc));
+        });
+      }
+
+      /*
+      function createPost(z) {
+        //alert(z.title + z.latlng + z.type);
+        var li = document.createElement("li");
+        var header = document.createElement("h3");
+        var paragraph = document.createElement("p");
+        var span = document.createElement("span");
+        var divDisplay = document.createElement("div");
+        li.appendChild(header);
+        li.appendChild(divDisplay);
+        header.appendChild(document.createTextNode(z.title));
+        //for loop
+        divDisplay.appendChild(paragraph);
+        divDisplay.appendChild(span);
+        divDisplay.appendChild(paragraph);
+        paragraph.appendChild(document.createTextNode(z.skills));
+        span.appendChild(document.createTextNode(z.address));
+        paragraph.appendChild(document.createTextNode(z.latlng));
+
+        return li;
+      }
+      */
+
+      function createPost(z) {
+        var li = document.createElement("ion-item");
+        var header = document.createElement("h3");
+        var paragraph = document.createElement("p");
+        paragraph.className = "blue"; //http://stackoverflow.com/questions/1115310/how-to-add-a-class-to-dom-element-in-javascript
+        var span = document.createElement("span");
+          //clickable
+          var a = document.createElement('a');
+          var linkText = document.createTextNode("SEE MORE");
+          a.appendChild(linkText);
+          a.href = "org/newpost/post.html";
+        var divDisplay = document.createElement("div");
+        li.appendChild(header);
+        li.appendChild(divDisplay);
+        header.appendChild(document.createTextNode(z.title));
+        //for loop
+        divDisplay.appendChild(paragraph);
+        divDisplay.appendChild(span);
+        divDisplay.appendChild(paragraph);
+        divDisplay.appendChild(a);
+        paragraph.appendChild(document.createTextNode(z.skills+ '\n'));
+        span.appendChild(document.createTextNode(z.address + '\n'));
+        paragraph.appendChild(document.createTextNode(z.datetime + '\n'));
+        span.appendChild(document.createTextNode(z.type + '\n'));
+        paragraph.appendChild(document.createTextNode(z.description + '\n'));
+        span.appendChild(document.createTextNode(z.deadline + '\n'));
+        paragraph.appendChild(document.createTextNode(z.application + '\n'));
+
+        return li;
+      }
+
+
+
+
+      function displayAllPosts() {
+
+        dbpostings.allDocs({include_docs: true, descending: true}).then(function (doc) {
+          //alert(JSON.stringify(doc.rows));
+          displayIndividualPosts(doc.rows);
+
+        }).catch(function(err){
+          console.log(err);
+        });
+
+      }
+
+      displayAllPosts();
 
     </script>
 

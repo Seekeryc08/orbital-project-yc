@@ -26,7 +26,7 @@ function onload() {
 }
 
 function onDeviceReady() {
-  alert("hi");
+  //alert("hi");
 }
 
 
@@ -167,7 +167,3 @@ myMain.controller('toggleMenu', function($scope, $ionicSideMenuDelegate) {
 })
 
 
-
-
-
-document.getElementById('why').innerHTML = 'works';
