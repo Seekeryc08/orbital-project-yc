@@ -52,7 +52,7 @@
     }
 
     ion-content {
-      background-color: #444444;
+      /*background-color: #444444;*/
     }
 
     activity-name{
@@ -147,9 +147,20 @@
             </div>
           </div>
 
+
           <!--Custom styling-->
           <ul id="postDisplay">
+          </ul>
 
+
+          <ul id="OppListUl" ng-controller="OppListController">
+
+            <li ng-repeat='phone in phones'>
+
+              <p>{{phone.name}}</p>
+              <p>{{phone.snippet}}</p>
+
+            </li>
 
           </ul>
 
@@ -353,6 +364,50 @@
       }
 
       displayAllPosts();
+
+
+//TESTING ANGULAR STARTS HERE
+
+      myMain.controller('OppListController', function($scope, $http) {
+        /* For some reason when I have this line as the first line of my controller function,
+        I get an error "Cannot read property 'parent' of undefined"
+
+          document.getElementById('OppListUl').innerHTML = "able to get into OppListController";
+
+        */
+        //var self = this;
+        //self.posts = [];
+/*
+        $scope.phones = [
+          {
+            name: 'Nexus S',
+            snippet: 'Fast just got faster with Nexus S.'
+          }, {
+            name: 'Motorola XOOM™ with Wi-Fi',
+            snippet: 'The Next, Next Generation tablet.'
+          }, {
+            name: 'MOTOROLA XOOM™',
+            snippet: 'The Next, Next Generation tablet.'
+          }
+        ];
+*/
+//how to use $http w couchdb
+
+        $http.get('phones.json').success(function(response) {
+
+$scope.phones = response;
+
+          //alert(response);
+
+          //document.getElementById('OppListUl').innerHTML = "NO errors entering into $http.get()";
+
+        }).error(function() {
+          //document.getElementById('OppListUl').innerHTML = "error getting data of posts";
+
+        });
+
+
+      });
 
     </script>
 
