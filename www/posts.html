@@ -1,0 +1,94 @@
+<style>
+
+    li{
+      margin: 15px 5px;
+      padding: 10px;
+      list-style:none;
+      background-color:silver;
+      line-height:150%;
+    }
+/*
+    activity-name{
+      font-family:Helvetica;
+      font-weight:bold;
+      font-size:1.3em;
+      display:block;
+      color:#282C35;
+    }
+
+    .blockparastyle{
+      margin:0px;
+    }
+
+    #orgnametextstyle {
+      color:#45494E;
+      letter-spacing:0.5px;
+      font-weight:bold;
+    }
+    org-name {
+    }
+    #orgnamestyle {
+      color:#437E40;
+      font-weight:bold;
+      font-family:Roboto;
+    }
+*/
+/*
+    #activitytypestyle{
+      float:right;
+      text-transform:uppercase;
+    }
+*/
+/*
+    activity-venue{
+      color:#45494E;
+    }
+
+    #activityvenuetextstyle{
+      display:inline-block;
+      color:#45494E;
+      letter-spacing:0.5px;
+      font-weight:bold;
+
+    }
+
+    #activityvenuestyle{
+      font-weight:bold;
+    }
+
+    user-distance{
+      display:block;
+      float:right;
+    }
+    activity-schedule{
+      display:block;
+      font-family:Roboto;
+      text-transform:uppercase;
+    }
+    org-img{
+      display:block;
+      height:80px;
+      width:80px;
+      float:left;
+      background-color:cyan;
+      margin-right:10px;
+    }
+*/
+
+
+
+</style>
+
+<ul>
+	<li ng-repeat="post in posts">
+		<a ui-sref="main.post-detail({postId: post.doc._id})"> {{post.doc.title}} </a>
+		<a> {{post.doc.orgname}} </a>
+		<a> {{post.doc.datetime}} </a>
+		<a> {{post.doc.venue}} </a>
+		<a> {{post.doc.deadline}} </a>
+	</li>
+</ul>
+
+
+<ion-nav-view></ion-nav-view>
+

@@ -167,3 +167,75 @@ myMain.controller('toggleMenu', function($scope, $ionicSideMenuDelegate) {
 })
 
 
+
+//TRYING TO DO ROUTING FOR MAIN.HTML
+myMain.config(function($stateProvider, $urlRouterProvider) {
+    $stateProvider
+        .state('main', {
+            url: '/main', //TO CHECK WHETHER THIS IS CORRECT
+            templateUrl: 'posts.html',
+            resolve: {
+              posts: ['posts', function (posts) {
+                return posts.all();
+              }]
+            },
+            controller: 'TestMainController' //I NEED VALUES HERE THAT ARE MAYBE... FROM MY DATABASE,
+                                            //TO BE DISPLAYED IN MY TEMPLATE
+        })
+
+        .state('main.post-detail', {
+            url: "/:postId", //represents a parameter that will be passed into our controller
+            templateUrl: "post-detail.html",
+
+            //on how to use resolve, https://github.com/angular-ui/ui-router/wiki#resolve
+            resolve: {
+                docdetail: function($stateParams) {
+                    var doc = $stateParams.postId;
+
+                    return dbpostings.get(doc).then(function (resp) {
+                        alert(resp.title);
+                        return resp;
+                    }).catch(function (err) {
+                      console.log(err);
+                    });
+                }
+            },
+
+            //get the document that has the clicked id, and I want to display all details of only
+            //that doc
+            controller: function ($scope, docdetail) {
+                $scope.docdetail = docdetail;
+            }
+
+        });
+
+    $urlRouterProvider.otherwise('/main');
+});
+
+
+
+myMain.factory('posts', ['$http', function($http) {
+  var path = 'http://localhost:5984/postings/_all_docs?limit=20&include_docs=true';
+
+  var posts = $http.get(path).then(function(response) {
+      document.getElementById('OppListUl').innerHTML = "NO errors entering into $http.get()";
+      return response.data.rows; //or response.data.rows
+  });
+
+  var factory = {};
+
+  factory.all = function() {
+    return posts;
+  };
+
+  return factory;
+}]);
+
+
+myMain.controller("TestMainController", ['$scope', 'posts', function($scope, posts) {
+
+    $scope.posts = posts;
+
+}]);
+
+

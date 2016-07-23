@@ -52,7 +52,7 @@
     }
 
     ion-content {
-      /*background-color: #444444;*/
+      background-color: #444444;
     }
 
     activity-name{
@@ -157,12 +157,22 @@
 
             <li ng-repeat='phone in phones'>
 
-              <p>{{phone.name}}</p>
-              <p>{{phone.snippet}}</p>
+              <p>{{phone.rows.doc.title}}</p>
+              <p>{{phone.rows.doc.orgname}}</p>
 
             </li>
 
           </ul>
+
+
+
+
+<!-- ROUTING ATTEMPT -->
+
+          <ion-nav-view></ion-nav-view>
+          <!-- THIS IS ONE ENTIRE PAGE HEIGHT-->
+
+
 
           <div class="padding-separate"></div>
           <a href="index.html">back to index</a>
@@ -288,17 +298,24 @@
         var activitySchedule = document.createElement("activity-schedule");
         var orgImg = document.createElement("org-img");
 
-          //clickable
-/*
-          var a = document.createElement('a');
-          var linkText = document.createTextNode("SEE MORE");
-          a.appendChild(linkText);
-          a.href = "org/newpost/post.html";
-*/
 
 
         orgImg.appendChild(document.createTextNode(z.application));
         li.appendChild(orgImg);
+
+
+//clickable
+
+          var a = document.createElement('a');
+          var linkText = document.createTextNode("SEE MORE");
+          a.appendChild(linkText);
+          a.title = "my title text";
+          a.href = "#/post-details/" + z.title + "";
+          li.appendChild(a);
+
+
+
+
 
 //for reference on appendChild(), http://www.w3schools.com/jsref/met_node_appendchild.asp
         header.appendChild(document.createTextNode(z.title));
@@ -366,9 +383,25 @@
       displayAllPosts();
 
 
+
+
+
+
+
+
+
+
+
+
+
 //TESTING ANGULAR STARTS HERE
 
-      myMain.controller('OppListController', function($scope, $http) {
+      myMain.constant('appSettings', {
+        db: 'http://127.0.0.1:5984/postings'
+      });
+
+      myMain.controller('OppListController', function($scope, $http, appSettings) {
+        console.log(appSettings);
         /* For some reason when I have this line as the first line of my controller function,
         I get an error "Cannot read property 'parent' of undefined"
 
@@ -393,13 +426,15 @@
 */
 //how to use $http w couchdb
 
-        $http.get('phones.json').success(function(response) {
-
-$scope.phones = response;
-
-          //alert(response);
-
+        $http.get('http://localhost:5984/postings/_all_docs?limit=20&include_docs=true').success(function(response) {
           //document.getElementById('OppListUl').innerHTML = "NO errors entering into $http.get()";
+/*
+          $scope.phones = response;
+*/
+          alert(response.rows);
+          alert(response.orgname);
+          alert(response.update_seq);
+
 
         }).error(function() {
           //document.getElementById('OppListUl').innerHTML = "error getting data of posts";
