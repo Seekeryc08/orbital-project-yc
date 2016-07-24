@@ -25,6 +25,105 @@
 
   </head>
 
+  <style>
+/*
+    #postDisplay {
+      padding: 35px 35px;
+    }
+
+    ion-mylist {
+
+    }
+    ion-myitem {
+      border:1px solid black;
+      border-left:none;
+      border-right:none;
+    }
+*/
+
+    li{
+      margin: 15px 5px;
+      padding: 10px;
+      list-style:none;
+
+      background-color:white;
+      line-height:150%;
+
+    }
+
+    ion-content {
+      background-color: #444444;
+    }
+
+    activity-name{
+      font-family:Helvetica;
+      font-weight:bold;
+      font-size:1.3em;
+      display:block;
+      color:#282C35;
+    }
+
+    .blockparastyle{
+      margin:0px;
+    }
+
+    #orgnametextstyle {
+      color:#45494E;
+      letter-spacing:0.5px;
+      font-weight:bold;
+    }
+    org-name {
+    }
+    #orgnamestyle {
+      color:#437E40;
+      font-weight:bold;
+      font-family:Roboto;
+    }
+
+/*
+    #activitytypestyle{
+      float:right;
+      text-transform:uppercase;
+    }
+*/
+
+    activity-venue{
+      color:#45494E;
+    }
+
+    #activityvenuetextstyle{
+      display:inline-block;
+      color:#45494E;
+      letter-spacing:0.5px;
+      font-weight:bold;
+
+    }
+
+    #activityvenuestyle{
+      font-weight:bold;
+    }
+
+    user-distance{
+      display:block;
+      float:right;
+    }
+    activity-schedule{
+      display:block;
+      font-family:Roboto;
+      text-transform:uppercase;
+    }
+    org-img{
+      display:block;
+      height:80px;
+      width:80px;
+      float:left;
+      background-color:cyan;
+      margin-right:10px;
+    }
+
+
+  </style>
+
     <body onload="onload()" ng-app="starter">
 
     <ion-side-menus>
@@ -48,9 +147,32 @@
             </div>
           </div>
 
+
+          <!--Custom styling-->
           <ul id="postDisplay">
+          </ul>
+
+
+          <ul id="OppListUl" ng-controller="OppListController">
+
+            <li ng-repeat='phone in phones'>
+
+              <p>{{phone.rows.doc.title}}</p>
+              <p>{{phone.rows.doc.orgname}}</p>
+
+            </li>
 
           </ul>
+
+
+
+
+<!-- ROUTING ATTEMPT -->
+
+          <ion-nav-view></ion-nav-view>
+          <!-- THIS IS ONE ENTIRE PAGE HEIGHT-->
+
+
 
           <div class="padding-separate"></div>
           <a href="index.html">back to index</a>
@@ -166,32 +288,79 @@
       */
 
       function createPost(z) {
-        var li = document.createElement("ion-item");
-        var header = document.createElement("h3");
-        var paragraph = document.createElement("p");
-        paragraph.className = "blue"; //http://stackoverflow.com/questions/1115310/how-to-add-a-class-to-dom-element-in-javascript
-        var span = document.createElement("span");
-          //clickable
+        var li = document.createElement("li");
+        var header = document.createElement("activity-name");
+        var orgName = document.createElement("org-name");
+        var activityType = document.createElement("activity-type");
+        //paragraph.className = "blue"; //http://stackoverflow.com/questions/1115310/how-to-add-a-class-to-dom-element-in-javascript
+        var activityVenue = document.createElement("activity-venue");
+        var userDistance = document.createElement("user-distance");
+        var activitySchedule = document.createElement("activity-schedule");
+        var orgImg = document.createElement("org-img");
+
+
+
+        orgImg.appendChild(document.createTextNode(z.application));
+        li.appendChild(orgImg);
+
+
+//clickable
+
           var a = document.createElement('a');
           var linkText = document.createTextNode("SEE MORE");
           a.appendChild(linkText);
-          a.href = "org/newpost/post.html";
-        var divDisplay = document.createElement("div");
-        li.appendChild(header);
-        li.appendChild(divDisplay);
+          a.title = "my title text";
+          a.href = "#/post-details/" + z.title + "";
+          li.appendChild(a);
+
+
+
+
+
+//for reference on appendChild(), http://www.w3schools.com/jsref/met_node_appendchild.asp
         header.appendChild(document.createTextNode(z.title));
-        //for loop
-        divDisplay.appendChild(paragraph);
-        divDisplay.appendChild(span);
-        divDisplay.appendChild(paragraph);
-        divDisplay.appendChild(a);
-        paragraph.appendChild(document.createTextNode(z.skills+ '\n'));
-        span.appendChild(document.createTextNode(z.address + '\n'));
-        paragraph.appendChild(document.createTextNode(z.datetime + '\n'));
-        span.appendChild(document.createTextNode(z.type + '\n'));
-        paragraph.appendChild(document.createTextNode(z.description + '\n'));
-        span.appendChild(document.createTextNode(z.deadline + '\n'));
-        paragraph.appendChild(document.createTextNode(z.application + '\n'));
+//the child document.createTextNode(z.title) has been appended to the var header, so
+//in the next step just need to append the header to the li.
+        li.appendChild(header);
+
+//floated activity type: KIV because I want to use img
+/*
+        activityType.setAttribute("id", "activitytypestyle");
+        activityType.innerHTML = z.type;
+        li.appendChild(activityType);
+*/
+
+        //var styleOrg = "<span style='color:#ff0000'>" + z.orgname + "</span>";
+        var orgNameText = document.createElement('span');
+        orgNameText.setAttribute("id", "orgnametextstyle");
+        orgNameText.innerHTML = "by: ";
+        orgName.setAttribute("id", "orgnamestyle");
+        orgName.innerHTML = z.orgname;
+        //document.getElementById("coloured").style.color = "#ff0000";
+        li.appendChild(orgNameText);
+        li.appendChild(orgName);
+        var blockpara = document.createElement('p');
+        blockpara.setAttribute('class', 'blockparastyle');
+        li.appendChild(blockpara);
+
+
+        activitySchedule.appendChild(document.createTextNode(z.datetime));
+        li.appendChild(activitySchedule);
+
+//venue
+        var activityVenueText = document.createElement('span');
+        activityVenueText.setAttribute("id", "activityvenuetextstyle");
+        activityVenueText.innerHTML = 'Venue: ';
+        activityVenue.setAttribute("id", "activityvenuestyle");
+        activityVenue.innerHTML = z.address;
+        li.appendChild(activityVenueText);
+        li.appendChild(activityVenue);
+
+
+        userDistance.appendChild(document.createTextNode(z.deadline));
+        li.appendChild(userDistance);
+
+
 
         return li;
       }
@@ -212,6 +381,68 @@
       }
 
       displayAllPosts();
+
+
+
+
+
+
+
+
+
+
+
+
+
+//TESTING ANGULAR STARTS HERE
+
+      myMain.constant('appSettings', {
+        db: 'http://127.0.0.1:5984/postings'
+      });
+
+      myMain.controller('OppListController', function($scope, $http, appSettings) {
+        console.log(appSettings);
+        /* For some reason when I have this line as the first line of my controller function,
+        I get an error "Cannot read property 'parent' of undefined"
+
+          document.getElementById('OppListUl').innerHTML = "able to get into OppListController";
+
+        */
+        //var self = this;
+        //self.posts = [];
+/*
+        $scope.phones = [
+          {
+            name: 'Nexus S',
+            snippet: 'Fast just got faster with Nexus S.'
+          }, {
+            name: 'Motorola XOOM™ with Wi-Fi',
+            snippet: 'The Next, Next Generation tablet.'
+          }, {
+            name: 'MOTOROLA XOOM™',
+            snippet: 'The Next, Next Generation tablet.'
+          }
+        ];
+*/
+//how to use $http w couchdb
+
+        $http.get('http://localhost:5984/postings/_all_docs?limit=20&include_docs=true').success(function(response) {
+          //document.getElementById('OppListUl').innerHTML = "NO errors entering into $http.get()";
+/*
+          $scope.phones = response;
+*/
+          alert(response.rows);
+          alert(response.orgname);
+          alert(response.update_seq);
+
+
+        }).error(function() {
+          //document.getElementById('OppListUl').innerHTML = "error getting data of posts";
+
+        });
+
+
+      });
 
     </script>
 
