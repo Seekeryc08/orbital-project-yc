@@ -152,7 +152,7 @@
           <ul id="postDisplay">
           </ul>
 
-
+<!--
           <ul id="OppListUl" ng-controller="OppListController">
 
             <li ng-repeat='phone in phones'>
@@ -163,7 +163,7 @@
             </li>
 
           </ul>
-
+-->
 
 
 
@@ -176,39 +176,7 @@
 
           <div class="padding-separate"></div>
           <a href="index.html">back to index</a>
-<!--
-          <ion-list>
-            <ion-item>
-                <div class="row">
-                  <div class="col col-90">
-                    <p class="title-index">Title Title Title Title Title Title Title Title Title Title Title Title Title Title Title Title Title Title</p>
-                  </div>
-                   <div class="col col-10">
-                      <img>
-                   </div>
-                </div>
 
-                <div class="row">
-                  <div class="col">
-                    <div>{Org name}</div>
-                  </div>
-                </div>
-
-                <div class="row">
-                  <div class="col">
-                    <div>{how far away}</div>
-                  </div>
-                </div>
-
-                <div class="row">
-                  <div class="col">
-                      <div>details fetched from database details fetched from database details fetched from database details fetched from database </div>
-                  </div>
-                </div>
-
-            </ion-item>
-          </ion-list>
--->
 
         </ion-content>
       </ion-side-menu-content>
@@ -254,7 +222,6 @@
       var dbpostings = new PouchDB('postings');
       var remoteCouch = "http://localhost:5984/postings";
 
-//FOR MAIN.HTML
 
 
       function displayIndividualPosts(x) {
@@ -263,29 +230,6 @@
           ul.appendChild(createPost(y.doc));
         });
       }
-
-      /*
-      function createPost(z) {
-        //alert(z.title + z.latlng + z.type);
-        var li = document.createElement("li");
-        var header = document.createElement("h3");
-        var paragraph = document.createElement("p");
-        var span = document.createElement("span");
-        var divDisplay = document.createElement("div");
-        li.appendChild(header);
-        li.appendChild(divDisplay);
-        header.appendChild(document.createTextNode(z.title));
-        //for loop
-        divDisplay.appendChild(paragraph);
-        divDisplay.appendChild(span);
-        divDisplay.appendChild(paragraph);
-        paragraph.appendChild(document.createTextNode(z.skills));
-        span.appendChild(document.createTextNode(z.address));
-        paragraph.appendChild(document.createTextNode(z.latlng));
-
-        return li;
-      }
-      */
 
       function createPost(z) {
         var li = document.createElement("li");
@@ -299,36 +243,31 @@
         var orgImg = document.createElement("org-img");
 
 
-
         orgImg.appendChild(document.createTextNode(z.application));
         li.appendChild(orgImg);
 
-
-//clickable
-
-          var a = document.createElement('a');
-          var linkText = document.createTextNode("SEE MORE");
-          a.appendChild(linkText);
-          a.title = "my title text";
-          a.href = "#/post-details/" + z.title + "";
-          li.appendChild(a);
+        //clickable
+        var a = document.createElement('a');
+        var linkText = document.createTextNode("SEE MORE");
+        a.appendChild(linkText);
+        a.title = "my title text";
+        a.href = "#/post-details/" + z.title + "";
+        li.appendChild(a);
 
 
 
-
-
-//for reference on appendChild(), http://www.w3schools.com/jsref/met_node_appendchild.asp
+      //for reference on appendChild(), http://www.w3schools.com/jsref/met_node_appendchild.asp
         header.appendChild(document.createTextNode(z.title));
-//the child document.createTextNode(z.title) has been appended to the var header, so
-//in the next step just need to append the header to the li.
+      //the child document.createTextNode(z.title) has been appended to the var header, so
+      //in the next step just need to append the header to the li.
         li.appendChild(header);
 
-//floated activity type: KIV because I want to use img
-/*
-        activityType.setAttribute("id", "activitytypestyle");
-        activityType.innerHTML = z.type;
-        li.appendChild(activityType);
-*/
+      //floated activity type: KIV because I want to use img
+      /*
+              activityType.setAttribute("id", "activitytypestyle");
+              activityType.innerHTML = z.type;
+              li.appendChild(activityType);
+      */
 
         //var styleOrg = "<span style='color:#ff0000'>" + z.orgname + "</span>";
         var orgNameText = document.createElement('span');
@@ -347,7 +286,7 @@
         activitySchedule.appendChild(document.createTextNode(z.datetime));
         li.appendChild(activitySchedule);
 
-//venue
+      //venue
         var activityVenueText = document.createElement('span');
         activityVenueText.setAttribute("id", "activityvenuetextstyle");
         activityVenueText.innerHTML = 'Venue: ';
@@ -356,19 +295,27 @@
         li.appendChild(activityVenueText);
         li.appendChild(activityVenue);
 
-
         userDistance.appendChild(document.createTextNode(z.deadline));
         li.appendChild(userDistance);
-
-
 
         return li;
       }
 
 
-
-
       function displayAllPosts() {
+
+        //maybe do a sync to pull data from remoteCouch to dbpostings here
+        function syncError() {
+            console.log('Unable to sync to remote');
+        }
+        function sync() {
+          var opts = {live: true};
+          dbpostings.sync(remoteCouch, opts, syncError);
+        }
+        if(remoteCouch) {
+          sync();
+        }
+
 
         dbpostings.allDocs({include_docs: true, descending: true}).then(function (doc) {
           //alert(JSON.stringify(doc.rows));
@@ -389,19 +336,15 @@
 
 
 
-
-
-
-
-
 //TESTING ANGULAR STARTS HERE
-
+/*
       myMain.constant('appSettings', {
         db: 'http://127.0.0.1:5984/postings'
       });
 
       myMain.controller('OppListController', function($scope, $http, appSettings) {
         console.log(appSettings);
+*/
         /* For some reason when I have this line as the first line of my controller function,
         I get an error "Cannot read property 'parent' of undefined"
 
@@ -410,7 +353,7 @@
         */
         //var self = this;
         //self.posts = [];
-/*
+  /*
         $scope.phones = [
           {
             name: 'Nexus S',
@@ -423,14 +366,16 @@
             snippet: 'The Next, Next Generation tablet.'
           }
         ];
-*/
-//how to use $http w couchdb
-
-        $http.get('http://localhost:5984/postings/_all_docs?limit=20&include_docs=true').success(function(response) {
-          //document.getElementById('OppListUl').innerHTML = "NO errors entering into $http.get()";
+  */
+  //how to use $http w couchdb
 /*
-          $scope.phones = response;
+        $http.get('http://localhost:5984/postings/_all_docs?limit=20&include_docs=true').success(function(response) {
 */
+          //document.getElementById('OppListUl').innerHTML = "NO errors entering into $http.get()";
+  /*
+          $scope.phones = response;
+  */
+/*
           alert(response.rows);
           alert(response.orgname);
           alert(response.update_seq);
@@ -443,7 +388,7 @@
 
 
       });
-
+*/
     </script>
 
   </body>

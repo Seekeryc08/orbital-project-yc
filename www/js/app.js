@@ -167,7 +167,6 @@ myMain.controller('toggleMenu', function($scope, $ionicSideMenuDelegate) {
 })
 
 
-
 //TRYING TO DO ROUTING FOR MAIN.HTML
 myMain.config(function($stateProvider, $urlRouterProvider) {
     $stateProvider
@@ -192,8 +191,22 @@ myMain.config(function($stateProvider, $urlRouterProvider) {
                 docdetail: function($stateParams) {
                     var doc = $stateParams.postId;
 
+
+                    //maybe do a sync to pull data from remoteCouch to dbpostings here
+                    function syncError() {
+                        console.log('Unable to sync with remote');
+                    }
+                    function sync() {
+                      var opts = {live: true};
+                      dbpostings.sync(remoteCouch, opts, syncError);
+                    }
+                    if(remoteCouch) {
+                      sync();
+                    }
+
+
                     return dbpostings.get(doc).then(function (resp) {
-                        alert(resp.title);
+                        //alert(resp.title);
                         return resp;
                     }).catch(function (err) {
                       console.log(err);
@@ -218,8 +231,7 @@ myMain.factory('posts', ['$http', function($http) {
   var path = 'http://localhost:5984/postings/_all_docs?limit=20&include_docs=true';
 
   var posts = $http.get(path).then(function(response) {
-      document.getElementById('OppListUl').innerHTML = "NO errors entering into $http.get()";
-      return response.data.rows; //or response.data.rows
+      return response.data.rows;
   });
 
   var factory = {};
