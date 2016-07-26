@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=no, width=device-width">
+    <title></title>
+
+    <link href="lib/ionic/css/ionic.css" rel="stylesheet">
+    <link href="css/style.css" rel="stylesheet">
+
+    <!-- IF using Sass (run gulp sass first), then uncomment below and remove the CSS includes above
+    <link href="css/ionic.app.css" rel="stylesheet">
+    -->
+
+    <!-- ionic/angularjs js -->
+    <script src="lib/ionic/js/ionic.bundle.js"></script>
+    <script src="lib/pouchdb/dist/pouchdb.min.js"></script>
+
+    <script src="http://maps.googleapis.com/maps/api/js?key=AIzaSyA2u0eQNzCuDMdzG4opRM1ELacupQbzX28&sensor=true"></script>
+
+    <!-- your app's js -->
+    <script src="js/testaddmarkers.js"></script>
+    <!-- cordova script (this will be a 404 during development) -->
+    <script src="cordova.js"></script>
+
+  </head>
+
+<body onload="onload()" ng-app="starter">
+
+
+    <ion-side-menus>
+
+      <!-- Center content -->
+      <ion-side-menu-content>
+        <ion-header-bar class="bar-stable">
+          <h1>Home</h1>
+        </ion-header-bar>
+
+        <ion-content>
+          <div ng-controller="MapCtrl" id="map" data-tap-disabled="true"></div>
+          <a href="main.html">Back to Main</a>
+        </ion-content>
+      </ion-side-menu-content>
+
+
+      <!-- Left menu -->
+      <ion-side-menu side="left">
+        <ion-header-bar class="bar-dark">
+
+          <h1 class="title">Preferences</h1>
+
+        </ion-header-bar>
+        <ion-content scroll="false">
+
+          <label class="item item-input item-select">
+          <div class="input-label">
+            Showing:
+          </div>
+          <select>
+            <option>Work</option>
+            <option>Volunteer</option>
+            <option selected>ALL</option>
+          </select>
+          </label>
+
+          <label class="item item-input item-select">
+          <div class="input-label">
+            Sort by:
+          </div>
+          <select>
+            <option></option>
+            <option selected>Proximity</option>
+          </select>
+          </label>
+        </ion-content>
+      </ion-side-menu>
+    </ion-side-menus>
+
+    <script>
+
+    </script>
+
+  </body>
+</html>
+
+
+
+
+
+
+
+
+

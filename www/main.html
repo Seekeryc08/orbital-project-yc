@@ -120,7 +120,12 @@
       background-color:cyan;
       margin-right:10px;
     }
-
+/*
+    #fixedTab{
+        position:fixed;
+        bottom:0px;
+    }
+*/
 
   </style>
 
@@ -136,7 +141,7 @@
           <a class="button button-icon icon ion-settings" href="profile-user.html"></a>
         </ion-header-bar>
 
-        <ion-content>
+        <ion-content class="">
           <div id="cres"></div>
 
           <div ng-controller="MapController" id="map" data-tap-disabled="true"></div>
@@ -167,15 +172,20 @@
 
 
 
+
+          <div class="padding-separate"></div>
+          <a href="testaddmarkers.html">Test Add Markers</a>
+          <a href="tabs-page.html">Tabs</a>
+          <a href="index.html">back to index</a>
+
+
+
+
+
 <!-- ROUTING ATTEMPT -->
 
           <ion-nav-view></ion-nav-view>
           <!-- THIS IS ONE ENTIRE PAGE HEIGHT-->
-
-
-
-          <div class="padding-separate"></div>
-          <a href="index.html">back to index</a>
 
 
         </ion-content>
