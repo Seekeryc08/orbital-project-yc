@@ -25,10 +25,51 @@ function onload() {
 	document.addEventListener("deviceready", onDeviceReady, false);
 }
 
-function onDeviceReady() {}
+function onDeviceReady() {
+	document.addEventListener("online", onOnline, false);
+    document.addEventListener("resume", onResume, false);
+    loadMapsApi();
+    //all runs
+}
 
+function onOnline () {
+	//1.problem because iOS emulator does not come online
+	//alert('ready');
+
+	loadMapsApi();
+}
+
+function onResume () {
+	loadMapsApi();
+}
+
+function loadMapsApi () {
+
+/*2.problem with this
+
+//cordova navigator.connection: Also make sure you include the "connection" plugin, otherwise navigator.connection will be undefined.
+//http://stackoverflow.com/questions/26527788/multi-device-hybrid-apps-google-map
+
+    if (navigator.connection.type === Connection.NONE || (global.google !== undefined && global.google.maps)) {
+        return;
+    }
+*/
+
+//3.yet to figure out if this has a problem
+	$.getScript('https://maps.googleapis.com/maps/api/js?key=AIzaSyA2u0eQNzCuDMdzG4opRM1ELacupQbzX28&sensor=true&callback=onMapsApiLoaded');
+	alert('ready');
+}
+
+
+//4.global is not defined - google maps callback
+global.onMapsApiLoaded = function () {
+
+	// Maps API loaded and ready to be used.
+
+};
 
 //FETCHING AND DISPLAYING MARKERS FROM MY DATABASE
+/*
 myApp.factory('Markers', function ($http) {
   var markers = [];
 
@@ -41,8 +82,9 @@ myApp.factory('Markers', function ($http) {
     }
   }
 });
+*/
 
-
+/*
 myApp.controller('MapCtrl', function($scope, Markers) {
 
     google.maps.event.addDomListener(window, 'load', function() {
@@ -110,6 +152,7 @@ myApp.controller('MapCtrl', function($scope, Markers) {
 				}
 			});
 		}
+*/
 /*
 		function addInfoWindow(marker, message, record) {
 
@@ -122,8 +165,9 @@ myApp.controller('MapCtrl', function($scope, Markers) {
 		  });
 
 		}
-*/
+
     });
 
 
 });
+*/

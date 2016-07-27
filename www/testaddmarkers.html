@@ -15,8 +15,7 @@
     <!-- ionic/angularjs js -->
     <script src="lib/ionic/js/ionic.bundle.js"></script>
     <script src="lib/pouchdb/dist/pouchdb.min.js"></script>
-
-    <script src="http://maps.googleapis.com/maps/api/js?key=AIzaSyA2u0eQNzCuDMdzG4opRM1ELacupQbzX28&sensor=true"></script>
+	<script src="js/jquery-3.1.0.min.js"></script>
 
     <!-- your app's js -->
     <script src="js/testaddmarkers.js"></script>
@@ -24,7 +23,12 @@
     <script src="cordova.js"></script>
 
   </head>
-
+	<style>
+		#map{
+			height:100%;
+			width:100%;
+		}
+	</style>
 <body onload="onload()" ng-app="starter">
 
 
