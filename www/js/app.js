@@ -34,29 +34,10 @@ function onDeviceReady() {
 https://www.npmjs.com/package/cordova-plugin-geolocation
 */
 
-//Can't get inside function myApp.controller('MapController', function($scope, $cordovaGeolocation){
+
+
 myMain.controller('MapController', function($scope) {
 
-  /* http://www.joshmorony.com/integrating-google-maps-with-an-ionic-application/
-
-  var options = {timeout: 10000, enableHighAccuracy: true};
-
-  $cordovaGeolocation.getCurrentPosition(options).then(function(position){
-
-    var latLng = new google.maps.LatLng(position.coords.latitude, position.coords.longitude);
-    var mapOptions = {
-      center: latLng,
-      zoom: 15,
-      mapTypeId: google.maps.MapTypeId.ROADMAP
-    };
-    $scope.map = new google.maps.Map(document.getElementById("map"), mapOptions);
-  }, function(error){
-      alert("Could not get location");
-  });
-  */
-
-
-    //what is dom listener load
     google.maps.event.addDomListener(window, 'load', function() {
 
         var myLatlng = new google.maps.LatLng(37.3000, -120.4833);
@@ -71,10 +52,6 @@ myMain.controller('MapController', function($scope) {
 
         //GET USER's LOCATION
         var onSuccess = function(position) {
-/*
-          alert('Latitude: '+ position.coords.latitude + '\n'
-              + 'Longitude: '+ position.coords.longitude);
-*/
               //geolocation working on my browser but NOT ON MY DEVICE; lat/lng is wrong!
               //what is displaying is the custom location that I set for my iOS simulator, not my current location
               //similarly, on android simulator, what is displaying is the location I ran geo fix, not my current location
@@ -96,9 +73,10 @@ myMain.controller('MapController', function($scope) {
         //UNABLE TO GET USER'S LOCATION ON DEVICE
         var options = {maximumAge: 0, timeout: 10000, enableHighAccuracy:true};
         navigator.geolocation.getCurrentPosition(onSuccess, onError, options);
-        /*http://www.tutorialspoint.com/android/android_emulator.htm*/
-        /*http://stackoverflow.com/questions/16262878/phonegap-geolocation-code-3-timeout-expired-keeps-popping-up-on-some-android*/
+        //http://www.tutorialspoint.com/android/android_emulator.htm
+        //http://stackoverflow.com/questions/16262878/phonegap-geolocation-code-3-timeout-expired-keeps-popping-up-on-some-android
         //http://stackoverflow.com/questions/4169061/android-emulator-having-issues-with-geolocation
+
 
         google.maps.event.addListenerOnce($scope.map, 'idle', function(){
 
@@ -129,6 +107,7 @@ myMain.controller('MapController', function($scope) {
 
 
 });
+
 
 
   function addMarker(location, map) {
@@ -167,7 +146,6 @@ myMain.controller('toggleMenu', function($scope, $ionicSideMenuDelegate) {
 })
 
 
-
 //TRYING TO DO ROUTING FOR MAIN.HTML
 myMain.config(function($stateProvider, $urlRouterProvider) {
     $stateProvider
@@ -192,8 +170,22 @@ myMain.config(function($stateProvider, $urlRouterProvider) {
                 docdetail: function($stateParams) {
                     var doc = $stateParams.postId;
 
+
+                    //maybe do a sync to pull data from remoteCouch to dbpostings here
+                    function syncError() {
+                        console.log('Unable to sync with remote');
+                    }
+                    function sync() {
+                      var opts = {live: true};
+                      dbpostings.sync(remoteCouch, opts, syncError);
+                    }
+                    if(remoteCouch) {
+                      sync();
+                    }
+
+
                     return dbpostings.get(doc).then(function (resp) {
-                        alert(resp.title);
+                        //alert(resp.title);
                         return resp;
                     }).catch(function (err) {
                       console.log(err);
@@ -218,8 +210,7 @@ myMain.factory('posts', ['$http', function($http) {
   var path = 'http://localhost:5984/postings/_all_docs?limit=20&include_docs=true';
 
   var posts = $http.get(path).then(function(response) {
-      document.getElementById('OppListUl').innerHTML = "NO errors entering into $http.get()";
-      return response.data.rows; //or response.data.rows
+      return response.data.rows;
   });
 
   var factory = {};
@@ -239,3 +230,21 @@ myMain.controller("TestMainController", ['$scope', 'posts', function($scope, pos
 }]);
 
 
+//FETCHING AND DISPLAYING MARKERS FROM MY DATABASE
+
+/*
+myMain.factory('Markers', function ($http) {
+  var markers = [];
+
+  return {
+    getMarkers: function(){
+
+      return $http.get("http://localhost:5984/postings/_all_docs?limit=20&include_docs=true").then(function(response){
+          markers = response.data.rows;
+          return markers;
+      });
+
+    }
+  }
+});
+*/
