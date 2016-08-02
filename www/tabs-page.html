@@ -180,7 +180,7 @@ myMain.config(function($stateProvider, $urlRouterProvider) {
 
         .state('opportunities.post-detail', {
             url: "/:postId", //represents a parameter that will be passed into our controller
-            templateUrl: "post-detail.html",
+            templateUrl: "tabs/opportunities.post-detail.html",
 
             //on how to use resolve, https://github.com/angular-ui/ui-router/wiki#resolve
             resolve: {
@@ -212,8 +212,36 @@ myMain.config(function($stateProvider, $urlRouterProvider) {
             },
             //get the document that has the clicked id, and I want to display all details of only
             //that doc
-            controller: function ($scope, docdetail) {
+            controller: function ($scope, docdetail, $ionicHistory) {
                 $scope.docdetail = docdetail;
+                if(docdetail.url != "") {
+                    document.getElementById('url').style.display = 'block';
+                }
+                if(docdetail.aboutOrg != "") {
+                    document.getElementById('aboutOrg').style.display = 'block';
+                }
+                if(docdetail.deadline != "") {
+                    document.getElementById('mainDeadline').style.display = 'block';
+                }
+                if(docdetail.skills != "") {
+                    document.getElementById('skillsBox').style.display = 'block';
+                }
+                if(docdetail.type == "Work") {
+                    document.getElementById('mainType').style.display = 'block';
+                    document.getElementById('mainTypeImg').src = "img/images.png";
+                } else if(docdetail.type == "Volunteer") {
+                    document.getElementById('mainType').style.display = 'block';
+                    document.getElementById('mainTypeImg').src = "img/helping-hands.jpg";
+                }
+                dbpostings.getAttachment(docdetail._id, "filename").then(function(blob) {
+                    var url = URL.createObjectURL(blob);
+                    document.getElementById("posterImg").src= url;
+                }).catch(function (err) {
+                  console.log(err);
+                });
+                document.getElementById('backButton').onclick=function() {
+                    $ionicHistory.goBack();
+                }
             }
         });
 
@@ -294,7 +322,7 @@ myMain.factory('posts', ['$http', function($http) {
 }]);
 
 myMain.controller("OpportunitiesController", ['$scope', 'posts', function($scope, posts) {
-  /*
+  /*REFRESH ATTEMPT
   $scope.doRefresh = function() {
 
     $http.get('/new-items')
@@ -308,23 +336,21 @@ myMain.controller("OpportunitiesController", ['$scope', 'posts', function($scope
 
   };
   */
-    $scope.posts = posts;
-    // or do db.getAttachment(doc,filename).then(function(blob) {}); here
+    //$scope.posts = posts;
 
-    //alert($scope.posts);
-
+/*
     dbpostings.info().then(function(result) {
       var totalDocs = result.doc_count;
       var i=0, idVar;
       for(i=0; i<totalDocs; i++) {
 
-          var idVar = "2016-07-31T21:42:07.924Z"; //id for each doc
+          var idVar = "2016-07-31T21:42:07.924Z"; //1. Get the Id for each doc
           document.getElementById('imageBox').setAttribute("class", "img-class-"+i);
 
           dbpostings.getAttachment(idVar, "filename").then(function(blob) { //blob is unique to this doc id
 
               var url = URL.createObjectURL(blob);
-              var img = document.createElement('img');
+              var img = document.createElement('img'); //2. Instead of creating this, why not document.getElementById of a certain img in my template, and in the next step attach .src = url to it?
               img.src = url;
               img.setAttribute("id", idVar);
               img.setAttribute("class", "img-class-set");
@@ -352,7 +378,28 @@ myMain.controller("OpportunitiesController", ['$scope', 'posts', function($scope
     }).catch(function (err) {
       console.log(err);
     });
+*/
+    for(var i=0; i<posts.length; i++) {
+        //alert(posts.length);
+        var post = posts[i];
+        //alert(post.doc.title);
+        var docId = post.doc._id;
+        //alert(dbpostings);
+        dbpostings.getAttachment(docId, "filename").then(function(blob) {
+            //alert('got into this');
+            var url = URL.createObjectURL(blob);
+            var postContent = "<img src='" + url + "'>" + ""; //ERROR: var postContent must be of type Node
 
+            appendPostToList(postContent);
+
+        }).catch(function (err) {
+            console.log(err);
+        });
+
+        function appendPostToList(content) {
+            document.getElementById('listDisplay').appendChild(content);
+        }
+    }
 }]);
 
 
@@ -575,8 +622,6 @@ myMain.controller('MapCtrl', function($scope, Markers, $state) {
                       $state.go('opportunities.post-detail', {postId: record.doc._id});
                     }
                 }); //http://stackoverflow.com/questions/12368902/google-maps-api-event-listener-for-infobubble-doesnt-work
-
-
 
             }
         }
