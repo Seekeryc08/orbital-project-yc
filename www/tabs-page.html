@@ -223,14 +223,16 @@ myMain.config(function($stateProvider, $urlRouterProvider) {
 
 myMain.factory('posts', ['$http', function($http) {
   function syncError() {
-    console.log('Unable to sync with remote');
+      console.log('Unable to sync with remote');
   }
   function sync() {
-    var opts = {live: true};
-    dbpostings.sync(remoteCouch, opts, syncError);
+      var opts = {live: true};
+      //dbpostings.sync(remoteCouch, opts, syncError);
+      //dbpostings.replicate.from(remoteCouch, opts, syncError);
+      PouchDB.replicate(remoteCouch, dbpostings, opts);
   }
   if(remoteCouch) {
-    sync();
+      sync();
   }
 
 
@@ -292,7 +294,20 @@ myMain.factory('posts', ['$http', function($http) {
 }]);
 
 myMain.controller("OpportunitiesController", ['$scope', 'posts', function($scope, posts) {
+  /*
+  $scope.doRefresh = function() {
 
+    $http.get('/new-items')
+     .success(function(newItems) {
+       //$scope.items = newItems;
+     })
+     .finally(function() {
+       // Stop the ion-refresher from spinning
+       $scope.$broadcast('scroll.refreshComplete');
+     });
+
+  };
+  */
     $scope.posts = posts;
     // or do db.getAttachment(doc,filename).then(function(blob) {}); here
 
@@ -326,7 +341,6 @@ myMain.controller("OpportunitiesController", ['$scope', 'posts', function($scope
               //img.removeAttribute("class");
               //var x = document.getElementById("imageBox").getAttribute("class");
               //alert(x);
-
 
 
               //document.getElementById('hello').querySelector('.img-class-j')
@@ -403,10 +417,10 @@ myMain.controller('MapCtrl', function($scope, Markers, $state) {
 
     //1. Get user's location, center the map.
     google.maps.event.addDomListener(window, 'load', function() {
-        var myLatlng = new google.maps.LatLng(37.3000, -120.4833);
+        var myLatlng = new google.maps.LatLng(1.3549256922034412, 103.86809349060059);
         var mapOptions = {
             center: myLatlng,
-            zoom: 15,
+            zoom: 14,
             mapTypeId: google.maps.MapTypeId.ROADMAP
         };
         var map = new google.maps.Map(document.getElementById("map"), mapOptions);
@@ -552,16 +566,35 @@ myMain.controller('MapCtrl', function($scope, Markers, $state) {
                     infoBubble.open(map, marker);//the marker I would open is the marker at the latlng where I clicked
 
                 });
+
                 //2d. go to next pg onclick infoBubble
                 google.maps.event.addDomListener(infoBubble.bubble_, 'click', function() {
-                    //TO IMPLEMENT: if what is clicked is the close window, then close window. if{};
-                    $state.go('opportunities.post-detail', {postId: record.doc._id});
+                    //if user clicks on close button, info bubble will close.
+                    //Only if infoBubble is still open after user clicks on it (which means user did not click on the close button, route to the next page
+                    if(infoBubble.isOpen_ == true) {
+                      $state.go('opportunities.post-detail', {postId: record.doc._id});
+                    }
                 }); //http://stackoverflow.com/questions/12368902/google-maps-api-event-listener-for-infobubble-doesnt-work
+
+
 
             }
         }
 
     });
+});
+
+myMain.controller('refresher', function($scope, $http) {
+  $scope.doRefresh = function() {
+    $http.get('/new-items')
+     .success(function(newItems) {
+       //$scope.items = newItems;
+     })
+     .finally(function() {
+       // Stop the ion-refresher from spinning
+       $scope.$broadcast('scroll.refreshComplete');
+     });
+  };
 });
 
 
