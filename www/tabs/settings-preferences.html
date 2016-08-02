@@ -1,0 +1,29 @@
+<ion-view title='preferences-opptype'>
+	<ion-content>
+		<ion-header>
+			<div style="font-size:1.5em; text-align:center;">Preferences</div>
+		</ion-header>
+		<label class="item item-input item-select">
+            <div class="input-label">
+              Display opportunities:
+            </div>
+            <select id='oppType' onchange="changeOppTypeDisplay()">
+              <option value='Work'>Work</option>
+              <option value='Volunteer'>Volunteer</option>
+              <option value='all' selected>ALL</option>
+            </select>
+		</label>
+
+
+        <label class="item item-input item-select">
+            <div class="input-label">
+            	Sort by:
+            </div>
+            <select>
+            	<option></option>
+            	<option selected>Proximity</option>
+            </select>
+        </label>
+
+    </ion-content>
+</ion-view>

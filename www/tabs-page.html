@@ -7,10 +7,6 @@
 
     <link href="lib/ionic/css/ionic.css" rel="stylesheet">
 
-    <!-- IF using Sass (run gulp sass first), then uncomment below and remove the CSS includes above
-    <link href="css/ionic.app.css" rel="stylesheet">
-    -->
-
     <!-- ionic/angularjs js -->
     <script src="lib/ionic/js/ionic.bundle.js"></script>
     <script src="lib/pouchdb/dist/pouchdb.min.js"></script>
@@ -29,6 +25,8 @@
   <style>
   #content {
   	line-height:1em;
+  	font-size: 1.2em;
+  	padding-right:20px;
   }
 
   #infoWindowTitle {
@@ -50,39 +48,43 @@
   #infoWindowDeadline {
         float:right;
   }
+  .tabs {
+    padding-bottom:0;
+    margin-bottom: 0;
+  }
 
+/*  #infoWindowArrow {float:right;} #bb {font-size: 22px;} */
 
   </style>
 
 	<body ng-app="starter">
+
     	<ion-content class="has-tabs">
+			  <ion-nav-view></ion-nav-view>
+			  <div class="tabs tabs-icon-top">
+          <a class="tab-item" ui-sref="home" nav-transition="none">
+          <i class="icon ion-map"></i>
+            Map
+          </a>
+          <a class="tab-item" ui-sref="opportunities.posts" nav-transition="none">
+          <i class="icon ion-ios-people"></i>
+            Opportunities
+          </a>
+          <a class="tab-item" ui-sref="care" nav-transition="none">
+          <i class="icon ion-heart"></i>
+            Care
+          </a>
+          <a class="tab-item" ui-sref="settings.options" nav-transition="none">
+          <i class="icon ion-gear-a"></i>
+            Settings
+          </a>
+          <a class="tab-item" ui-sref="search" nav-transition="none">
+          <i class="icon ion-search"></i>
+            Search
+          </a>
+        </div>
 
-			<div class="tabs tabs-icon-top">
-			  <a class="tab-item" ui-sref="home" nav-transition="none">
-				<i class="icon ion-map"></i>
-				Map
-			  </a>
-			  <a class="tab-item" ui-sref="opportunities.posts" nav-transition="none">
-				<i class="icon ion-ios-people"></i>    Opportunities
-
-			  </a>
-			  <a class="tab-item" ui-sref="care" nav-transition="none">
-				<i class="icon ion-heart"></i>
-				Care
-			  </a>
-			  <a class="tab-item" ui-sref="settings" nav-transition="none">
-				<i class="icon ion-gear-a"></i>
-				Settings
-			  </a>
-			  <a class="tab-item" ui-sref="search" nav-transition="none">
-				<i class="icon ion-search"></i>
-				Search
-			  </a>
-			</div>
-
-			<ion-nav-view></ion-nav-view>
-
-	        </ion-content>
+	    </ion-content>
     	<script>
 
 var dbpostings = new PouchDB('postings');
@@ -107,9 +109,9 @@ myMain.run(function($ionicPlatform) {
     }
   });
 })
-myMain.config(['$ionicConfigProvider', function($ionicConfigProvider) { //, $stateProvider, $urlRouterProvider
-	$ionicConfigProvider.tabs.position('bottom'); // other values: top
-}]);
+myMain.config(function($ionicConfigProvider) { //, $stateProvider, $urlRouterProvider
+
+});
 
 myMain.config(function($stateProvider, $urlRouterProvider) {
     $stateProvider
@@ -127,13 +129,14 @@ myMain.config(function($stateProvider, $urlRouterProvider) {
         .state('opportunities.posts', {
         	url: '/posts',
         	templateUrl: 'tabs/opportunities.posts.html', //templateUrl: 'posts.html',
-			resolve: {
-			  posts: ['posts', function (posts) {
-				return posts.all();
-			  }]
-			},
-			controller: 'OpportunitiesController' //I NEED VALUES HERE THAT ARE MAYBE... FROM MY DATABASE,
-													//TO BE DISPLAYED IN MY TEMPLATE
+          resolve: {
+            posts: ['posts', function (posts) {
+              //resolve db.getAttachment(doc,filename).then(function(blob) {}); here
+              return posts.all();
+            }]
+          },
+          controller: 'OpportunitiesController' //I NEED VALUES HERE THAT ARE MAYBE... FROM MY DATABASE,
+                              //TO BE DISPLAYED IN MY TEMPLATE
         })
 
         .state('care', {
@@ -143,7 +146,31 @@ myMain.config(function($stateProvider, $urlRouterProvider) {
 
         .state('settings', {
         	url: '/settings',
-        	templateUrl: 'tabs/settings.html'
+        	templateUrl: 'tabs/settings.html',
+        	abstract: true
+        })
+
+        .state('settings.options', {
+          url: '/options',
+          views: {
+              'preferencesOpptype': {
+                templateUrl: 'tabs/settings-preferences-opptype.html'
+                //controller:
+              },
+              'sortBy': {
+                templateUrl: 'tabs/settings-sortby.html'
+              },
+              'preferences': {
+                templateUrl: 'tabs/settings-preferences.html',
+                resolve: {
+                  posts: ['posts', function (posts) {
+                    return posts.all();
+                  }]
+                },
+                controller: 'SettingsController'
+              }
+
+          }
         })
 
         .state('search', {
@@ -163,17 +190,19 @@ myMain.config(function($stateProvider, $urlRouterProvider) {
                     //maybe do a sync to pull data from remoteCouch to dbpostings here
                     function syncError() {
                         console.log('Unable to sync with remote');
+                        //alert('error here');
                     }
                     function sync() {
                       var opts = {live: true};
                       dbpostings.sync(remoteCouch, opts, syncError);
+                      //alert(remoteCouch);
                     }
                     if(remoteCouch) {
+                      //alert('hi we here');
                       sync();
                     }
-
-
                     return dbpostings.get(doc).then(function (resp) {
+                        //alert('return');
                         //alert(resp.title);
                         return resp;
                     }).catch(function (err) {
@@ -181,13 +210,11 @@ myMain.config(function($stateProvider, $urlRouterProvider) {
                     });
                 }
             },
-
             //get the document that has the clicked id, and I want to display all details of only
             //that doc
             controller: function ($scope, docdetail) {
                 $scope.docdetail = docdetail;
             }
-
         });
 
     $urlRouterProvider.otherwise('/');
@@ -195,16 +222,70 @@ myMain.config(function($stateProvider, $urlRouterProvider) {
 
 
 myMain.factory('posts', ['$http', function($http) {
-  var path = 'http://localhost:5984/postings/_all_docs?limit=20&include_docs=true';
+  function syncError() {
+    console.log('Unable to sync with remote');
+  }
+  function sync() {
+    var opts = {live: true};
+    dbpostings.sync(remoteCouch, opts, syncError);
+  }
+  if(remoteCouch) {
+    sync();
+  }
 
+
+/* var path = 'http://localhost:5984/postings/_all_docs?limit=20&include_docs=true';
   var posts = $http.get(path).then(function(response) {
       return response.data.rows;
   });
-
+*/
   var factory = {};
 
   factory.all = function() {
-    return posts;
+  var postsDB = dbpostings.allDocs({include_docs: true, attachments: true}).then(function(result) {
+      //do something with the result
+      //alert(result.rows);
+      return result.rows;
+  }).catch(function (err) {
+      console.log(err);
+  });
+
+    //or do db.getAttachment(doc,filename).then(function(blob) {}); here
+    //for the total no. of docs
+/*
+    dbpostings.info().then(function(result) {
+      var totalDocs = result.doc_count;
+      var i=0, idVar;
+      for(i=0; i<totalDocs; i++) {
+        //get the id of each doc and store into idVar.
+        //run dbpostings.getAttachment(idVar, "filename").
+        //ERROR - Note that this will append all imgs only to the first imageBox
+        //maybe could run another for loop with var j, imageBox[j], but imageBox is not an array
+
+      }
+    }).catch(function (err) {
+      console.log(err);
+    });
+
+
+    var idVar = "2016-07-31T07:07:38.702Z";
+    dbpostings.getAttachment(idVar, "filename").then(function(blob) {
+        var url = URL.createObjectURL(blob);
+        var img = document.createElement('img');
+        img.src = url;
+        document.getElementById('imageBox').appendChild(img);
+    }).catch(function (err) {
+        console.log(err);
+    });
+*/
+
+    //return posts;
+
+    //instead of returning posts from 'http://localhost:5984/postings/_all_docs?limit=20&include_docs=true',
+    //return posts from dbpostings so that I could get the attachment data to insert
+    //set attachments:true under dbpostings.get
+
+    return postsDB;
   };
 
   return factory;
@@ -213,12 +294,88 @@ myMain.factory('posts', ['$http', function($http) {
 myMain.controller("OpportunitiesController", ['$scope', 'posts', function($scope, posts) {
 
     $scope.posts = posts;
+    // or do db.getAttachment(doc,filename).then(function(blob) {}); here
+
+    //alert($scope.posts);
+
+    dbpostings.info().then(function(result) {
+      var totalDocs = result.doc_count;
+      var i=0, idVar;
+      for(i=0; i<totalDocs; i++) {
+
+          var idVar = "2016-07-31T21:42:07.924Z"; //id for each doc
+          document.getElementById('imageBox').setAttribute("class", "img-class-"+i);
+
+          dbpostings.getAttachment(idVar, "filename").then(function(blob) { //blob is unique to this doc id
+
+              var url = URL.createObjectURL(blob);
+              var img = document.createElement('img');
+              img.src = url;
+              img.setAttribute("id", idVar);
+              img.setAttribute("class", "img-class-set");
+              //use the appendChild(img) mtd to append each of the imgs to somewhere - not imageBox
+              //all images are inevitably appended to the same div
+              document.getElementById('hello').appendChild(img);
+
+
+              //need to retrieve the images - one img at a time- from this div to be appended into imageBox
+
+              //fails because unable to detect.
+              //var y = document.getElementById("hello").querySelector("img-class-set");
+              //alert(y);
+              //img.removeAttribute("class");
+              //var x = document.getElementById("imageBox").getAttribute("class");
+              //alert(x);
+
+
+
+              //document.getElementById('hello').querySelector('.img-class-j')
+          }).catch(function (err) {
+              console.log(err);
+          });
+
+      }
+    }).catch(function (err) {
+      console.log(err);
+    });
 
 }]);
 
 
+myMain.controller("SettingsController", ['$scope', 'posts', function($scope, posts) {
 
+    changeOppTypeDisplay = function(){
+        var oppType = document.getElementById("oppType");
+        var selectedValue = oppType.options[oppType.selectedIndex].value;
 
+        //1. Communicate through the posts factory?
+        //Is it possible to change the code of the posts factory and cause the OpportunitiesController and MapCtrl to reload?
+        //http://stackoverflow.com/questions/30680095/move-some-code-from-controller-to-factory-in-angular
+
+        posts.forEach(function(y) {
+            alert(y.doc._id);
+            if(y.doc.type != selectedValue) {
+                alert(dbpostings);
+                dbpostings.remove(y.doc); //causes sync and doc to be also deleted from remoteCouch Server
+            }
+            //alert(dbpostings.rows);
+        });
+/*
+        var postsOppType = dbpostings.allDocs({include_docs: true, attachments: true}).then(function(result) {
+            return result.rows;
+        }).catch(function (err) {
+            console.log(err);
+        });
+
+        $scope.postsOppType = posts;
+        alert($scope.postsOppType);
+        //posts.all($scope.postsOppType);
+*/
+        //2. change $scope value of OpportunitiesController/MapCtrl from this controller
+
+    };
+
+}]);
 
 //UNABLE TO PLACE ALL MY MAPS CODE IN TABS/MAP.JS
 function onload() {
@@ -241,10 +398,11 @@ myMain.factory('Markers', function ($http) {
   }
 });
 
-myMain.controller('MapCtrl', function($scope, Markers) {
 
+myMain.controller('MapCtrl', function($scope, Markers, $state) {
+
+    //1. Get user's location, center the map.
     google.maps.event.addDomListener(window, 'load', function() {
-
         var myLatlng = new google.maps.LatLng(37.3000, -120.4833);
         var mapOptions = {
             center: myLatlng,
@@ -254,16 +412,14 @@ myMain.controller('MapCtrl', function($scope, Markers) {
         var map = new google.maps.Map(document.getElementById("map"), mapOptions);
         $scope.map = map;
 
-        //GET USER's LOCATION
+        //Get User's location
         var onSuccess = function(position) {
-
-			map.setCenter(new google.maps.LatLng(position.coords.latitude, position.coords.longitude));
-			var myLocation = new google.maps.Marker({
-				position: new google.maps.LatLng(position.coords.latitude, position.coords.longitude),
-				map: map,
-				title: "My Location"
-			});
-
+          map.setCenter(new google.maps.LatLng(position.coords.latitude, position.coords.longitude));
+          var myLocation = new google.maps.Marker({
+            position: new google.maps.LatLng(position.coords.latitude, position.coords.longitude),
+            map: map,
+            title: "My Location"
+          });
         };
 
         function onError(error) {
@@ -275,80 +431,138 @@ myMain.controller('MapCtrl', function($scope, Markers) {
         navigator.geolocation.getCurrentPosition(onSuccess, onError, options);
 
         google.maps.event.addListenerOnce($scope.map, 'idle', function(){
-			//Load the markers
-			loadMarkers();
-
+            loadMarkers();
         });
 
 
-		function loadMarkers(){
-			//Get all of the markers from our Markers factory
-			Markers.getMarkers().then(function(markers){
 
-				var records = markers;
+        //2. loadMarkers - 4 parts
+        //(a)find user's location and pass into next function
+        //(b)load each marker using for loop from database containing all records, and add to map
+        //(c)run the distance matrix service to pass distance/duration etc, along with the current record and marker, into a function of a to-be-created infoBubble
+        //(d)display infoBubble when marker is clicked and route to the next pg upon clicking that infoBubble
 
-				for (var i = 0; i < records.length; i++) {
+        function loadMarkers(){
+            //2(a)
+            function onError(error) {alert('code: '    + error.code    + '\n' + 'message: ' + error.message + '\n');}
+            var options = {maximumAge: 0, timeout: 10000, enableHighAccuracy:true};
+            navigator.geolocation.getCurrentPosition(onSuccess, onError, options);
 
-					var record = records[i];
-					var markerPos = new google.maps.LatLng(record.doc.lat, record.doc.lng);
+            function onSuccess(position) {
+                var userLoc = new google.maps.LatLng(position.coords.latitude, position.coords.longitude);
+                //var userLoc = new google.maps.LatLng(1.3360910507988086, 103.91075134277344);
+                loadMarkers2(userLoc);
+            }
 
-					// Add the marker to the map
-					var marker = new google.maps.Marker({
-						map: map,
-						animation: google.maps.Animation.DROP,
-						position: markerPos
-					});
+            //2(b)
+            function loadMarkers2(userLoc) {
+                //2bi: retrieve each record containing the marker
+                Markers.getMarkers().then(function(markers){
+                    var records = markers;
+                    for (var i = 0; i < records.length; i++) {
+                        var record = records[i];
 
-					var infoBubbleContent = "<div id='content'><p id='infoWindowTitle'>" + record.doc.title +
-						"</p><p id='infoWindowOrgname'>" + record.doc.orgname +
-						"</p><p id='infoWindowDeadline'>" + record.doc.deadline +
-						"</p><p id='infoWindowAddress'>" + record.doc.address +
-						"</p><p id='infoWindowType'>" + record.doc.type +
-						"</p><p id='infoWindowDatetime'>" + record.doc.datetime +
-						"</p></div>";
-					addInfoBubble(marker, infoBubbleContent, record);
+                        //2bii: Add the marker to the map
+                        var markerPos = new google.maps.LatLng(record.doc.lat, record.doc.lng);
+                        var marker = new google.maps.Marker({
+                          map: map,
+                          animation: google.maps.Animation.DROP,
+                          position: markerPos //event.latLng?
+                        });
 
-/*
-					var infoWindowContent = "<h4>" + record.doc.title + "</h4>";
-					addInfoWindow(marker, infoWindowContent, record);
-*/
-				}
-			});
-		}
+                        var destination = record.doc.address; //Notes: FOR G MAPS DISTANCE MATRIX - get the latlng value from database, from the particular doc. var destination = "(" + record.doc.lat + ", " + record.doc.lng + ")"; - FAILS: in property location: not a LatLng or LatLngLiteral: not an Object. var destination = "(1.3716722389317273, 103.88294219970703)"; - FAILS TOO; MUST BE CODED. //var destination = new google.maps.LatLng(record.doc.lat, record.doc.lng);
+                        loadMarkers3(marker, destination, record);
 
-		function addInfoBubble(marker, message, record) {
-			var infoBubble = new InfoBubble({
-				minWidth: 250,
-				maxWidth: 250,
-				minHeight: 100,
-				borderRadius: 0,
-				borderWidth: 5,
-				borderColor: 'rgb(84, 9, 9)',
-				content: message
-			});
-			google.maps.event.addListener(marker, 'click', function() {
-				infoBubble.open(map, marker);
-			});
-		}
+                        //2(c)
+                        function loadMarkers3(marker, destination, record) {
+                            //2ci: Run the distance matrix service - find distance and duration from marker to userLoc
+                            var service = new google.maps.DistanceMatrixService();
+                            service.getDistanceMatrix(
+                              {
+                                origins: [userLoc],
+                                destinations: [destination], //NOT NECESSARY TO GEOCODE AFTER ALL. var geocoder = new google.maps.Geocoder; geocoder.geocode({'location': userLoc}, function(results, status) {if (status === 'OK') {var formattedLoc1 = results[0].formatted_address;console.log(formattedLoc1);} else {console.log('Geocoder failed due to: ' + status);}}); geocoder.geocode({'location': destination}, function(results, status) {if (status === 'OK') {var formattedLoc1 = results[0].formatted_address;console.log(formattedLoc1);} else {console.log('Geocoder failed due to: ' + status);}});
+                                travelMode: 'TRANSIT'
+                              }, callback);
+                            var userTravelMode = "PUBLIC TRANSPORT"; //depends on what mode they select
 
-/*
-		function addInfoWindow(marker, message, record) {
-		  var infoWindow = new google.maps.InfoWindow({
-			  content: message
-		  });
-		  google.maps.event.addListener(marker, 'click', function () {
-			  infoWindow.open(map, marker);
-		  });
-		}
-*/
+                            function callback(response, status) {
+                                //alert(destination); //SUCCESSFULLY LOADS ALL DATABASE ADDRESSES
+                                if (status == 'OK') {
+                                  var origins = response.originAddresses;
+                                  var destinations = response.destinationAddresses;
+
+                                  for (var j = 0; j < origins.length; j++) {
+                                      var results = response.rows[j].elements;
+
+                                      for (var k = 0; k < results.length; k++) {
+                                        var element = results[k];
+                                        var distance, duration;
+                                        distance = element.distance.text;
+                                        duration = element.duration.text;
+                                        document.getElementById('random').innerHTML = "It takes me <b>"+duration+ "</b> to go <b>"+distance+"</b> from <u>"+origins[k]+"</u> to <u>"+destinations[k]+"</u> by <b>"+userTravelMode+"</b>.";
+
+                                        //2cii: Pass relevant data obtained from distance matrix, along with record and marker, to infoBubble
+                                        addInfoBubble(marker, distance, duration, record);
+                                      }
+                                  }
+
+                                } else {
+                                  console.log('there is an error in the callback to the service.getDistanceMatrix.');
+                                }
+                                //the value of distance is available until here, within the callback function
+                            };
+
+                        }
+
+                    }// for loop ends
+
+                });
+            }
+
+            //2(d)
+            function addInfoBubble(marker, distance, duration, record) {
+                var infoBubble = new InfoBubble({
+                    minWidth: 250,
+                    maxWidth: 250,
+                    minHeight: 100,
+                    borderRadius: 0,
+                    borderWidth: 5,
+                    borderColor: 'rgb(84, 9, 9)',
+                    content: "",
+                    distance: distance,
+                    duration: duration
+                });
+                infoBubble.content =
+                    "<div id='infoBubble'>" +
+                        "<div id='content'>" +
+                            "<p id='infoWindowTitle'>" + record.doc.title +
+                            "</p><p id='infoWindowOrgname'>" + record.doc.orgname +
+                            "</p><p id='infoWindowDeadline'>" + record.doc.deadline +
+                            "</p><p id='infoWindowAddress'>" + record.doc.address +
+                            "</p><p id='infoWindowType'>" + record.doc.type +
+                            "</p><p id='infoWindowDatetime'>" + record.doc.datetime +
+                            "</p><p id='distanceReturned'>" + infoBubble.distance +
+                            "</p><p id='durationReturned'>" + infoBubble.duration +
+                            "</p>" +
+                        "</div>" +
+                    "</div>";
+
+                google.maps.event.addListener(marker, 'click', function() {
+                    //alert(marker.position);
+                    infoBubble.open(map, marker);//the marker I would open is the marker at the latlng where I clicked
+
+                });
+                //2d. go to next pg onclick infoBubble
+                google.maps.event.addDomListener(infoBubble.bubble_, 'click', function() {
+                    //TO IMPLEMENT: if what is clicked is the close window, then close window. if{};
+                    $state.go('opportunities.post-detail', {postId: record.doc._id});
+                }); //http://stackoverflow.com/questions/12368902/google-maps-api-event-listener-for-infobubble-doesnt-work
+
+            }
+        }
+
     });
-
 });
-
-
-
-
-
 
 
     	</script>
