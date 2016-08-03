@@ -1,4 +1,7 @@
 <style>
+	body{
+	    height:92%;
+	}
 
 #poster{
     background-color:cyan;
@@ -102,6 +105,19 @@ a {
 .tabs{
     display:none;
 }
+/*
+#mapBox {
+    border:1px solid grey;
+    width: 90%;
+  height: 40%;
+  margin:0 auto;
+}
+*/
+#mapPostDetail {
+  width:90%;
+  height:40%;
+  margin:10px auto;
+}
 </style>
 
 
@@ -166,13 +182,16 @@ a {
         <a href='{{docdetail.url}}'>
             {{docdetail.url}}
         </a>
+        <div id='openUrl'>{{docdetail.url}}</div>
     </div>
 
     <div id="aboutOrg">
         <div id='aboutOrgLabel'><b>About This Group:</b></div>
         {{docdetail.aboutorg}}
     </div>
-
+    <!--<div id='mapBox'>-->
+        <div id="mapPostDetail" data-tap-disabled="true"></div>
+    <!--</div>-->
     <!--DISPLAY MAP HERE-->
 </ion-content>
 
