@@ -113,13 +113,14 @@
           <!--
           <ion-refresher pulling-text="Pull to refresh..." on-refresh="doRefresh()"></ion-refresher>
           -->
+          <!--
           <ul>
               <li ng-repeat="post in posts">
-              <!--
+
                 <div id="imageBox" class=''>
                     {{post.doc.title}}
                 </div>
-              -->
+
                 <a ui-sref="opportunities.post-detail({postId: post.doc._id})"> {{post.doc.title}} </a>
                 <a> {{post.doc.orgname}} </a>
                 <a> {{post.doc.datetime}} </a>
@@ -128,9 +129,9 @@
                 <a> {{post.doc.deadline}} </a>
               </li>
           </ul>
+          -->
 
-
-          <ul id='ulDisplay'>
+          <ul id='listDisplay'>
               <!--THIS MTD WON'T WORK BECAUSE I'M NOT DOING ng-repeat and not using $scope.posts=posts
               <li id='listDisplay' ui-sref="opportunities.post-detail({postId: post.doc._id})">
               </li>
