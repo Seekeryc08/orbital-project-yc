@@ -1,55 +1,10 @@
-<!DOCTYPE html>
-<html>
-  <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=no, width=device-width">
-    <title></title>
+  <ion-header-bar class="bar-stable">
+      <h1 class="title">Work or Volunteer Nearby</h1>
+  </ion-header-bar>
 
-    <link href="lib/ionic/css/ionic.css" rel="stylesheet">
-    <link href="css/style.css" rel="stylesheet">
+<ion-content id='oppBackground'>
+      <ul id='listDisplay'>
+      </ul>
+</ion-content>
 
-    <!-- ionic/angularjs js -->
-    <script src="lib/ionic/js/ionic.bundle.js"></script>
-    <script src="lib/pouchdb/dist/pouchdb.min.js"></script>
 
-    <!-- cordova script (this will be a 404 during development) -->
-    <script src="cordova.js"></script>
-
-  </head>
-
-	<style>
-
-	li{
-	  margin: 15px 5px;
-	  padding: 10px;
-	  list-style:none;
-	  background-color:silver;
-	  line-height:150%;
-	}
-	</style>
-
-	<body>
-        <ion-content>
-
-			<ul>
-				<li ng-repeat="post in posts">
-					<!--on click, to trigger a whole new view-->
-					<a ui-sref="opportunities.post-detail({postId: post.doc._id})"> {{post.doc.title}} </a>
-					<a> {{post.doc.orgname}} </a>
-					<a> {{post.doc.datetime}} </a>
-					<a> {{post.doc.venue}} </a>
-					<a> {{post.doc.deadline}} </a>
-				</li>
-			</ul>
-
-			<a href="../testaddmarkers.html">Test Add Markers</a>
-			<a href="../tabs-page.html">Tabs</a>
-			<a href="../index.html">back to index</a>
-
-        </ion-content>
-
-		<script>
-
-		</script>
-  </body>
-</html>

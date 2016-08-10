@@ -39,9 +39,8 @@
         <div class="padding-separate"></div>
 
         <!--NO MAP FOR SUCCESSFUL FORM SUBMISSION-->
-        <div ng-controller="MapController" id="map" data-tap-disabled="true"></div>
 
-        <p id="test_1">bla</p>
+        <div ng-controller="MapController" id="map" data-tap-disabled="true"></div>
 
         <!--NO ng-controller="myForm" FOR SUCCESSFUL FORM SUBMISSION-->
         <form id="postingForm">
@@ -50,6 +49,11 @@
               <label class="item item-input">
                 <span class="input-label">Title</span>
                 <input name="title" id="title" type="text">
+              </label>
+              <!--org name... to obtain from database-->
+              <label class="item item-input">
+                <span class="input-label">Org Name</span>
+                <input name="orgname" id="" type="text">
               </label>
               <label class="item item-input">
                 <span class="input-label">Skills</span>
@@ -60,10 +64,15 @@
                 <input name="address" id="" type="text">
               </label>
               <label class="item item-input">
-                <span class="input-label">Pos. latLng</span>
-                <input name="latlng" id="" type="text">
+                <span class="input-label">Pos. lat</span>
+                <input name="lat" id="" type="text">
               </label>
-<!--
+
+              <label class="item item-input">
+                <span class="input-label">Pos. lng</span>
+                <input name="lng" id="" type="text">
+              </label>
+
               <!--use datepicker-->
               <label class="item item-input">
                 <span class="input-label">Date and Time</span>
@@ -80,6 +89,11 @@
               </select>
               </label>
 
+              <label class="item item-input">
+                <span class="input-label">Upload File</span>
+                <input type="file" class="file-upload" name="attachment" id="">
+              </label>
+
               <label class="item item-input item-stacked-label">
                 <span class="input-label">Description</span>
                   <textarea name="description" placeholder="Tell the user more information about this opportunity"></textarea>
@@ -94,7 +108,7 @@
 
               <label class="item item-input item-select">
                 <div class="input-label">
-                  Do you want users to apply through the app?
+                  Apply here?
                 </div>
                 <select id="application" name="application" onchange="showOrHideOptions()">
                   <option>No</option>
@@ -120,7 +134,7 @@
 
               <!-- Provide customised options to ask more questions-->
 
--->
+
               <div class="row">
                 <div class="col text-center">
                   <button id="" class="button button-positive">Submit</button>
@@ -128,47 +142,93 @@
               </div>
             </div>
         </form>
-
+<!--
 		    <a href="index.html">Take me to org main page</a>
-
-
+-->
+<!--
         <ion-list id="postDisplay">
         </ion-list>
-
+-->
       </ion-content>
 
 
     <script>
+
+      function showOrHideOptions() {
+        if(document.getElementById("application").selectedIndex == "1") {
+          //alert("hey");
+          document.getElementById("optionalApplication").style.display = "block";
+        } else if(document.getElementById("application").selectedIndex == "0"){
+          document.getElementById("optionalApplication").style.display = "none";
+        }
+      }
 
 var dbpostings = new PouchDB('postings');
 var remoteCouch = "http://localhost:5984/postings";
 var postings;
 postings = document.getElementById('postingForm');
 
+var inputFile = document.querySelector('.file-upload');
+var filename = "helloworld.png";
 
 addPost = function(event) {
-
-  document.getElementById("test_1").innerHTML = "changed";
-
+  var file = inputFile.files[0];
+  //alert(file.type);  - gives image/png
   var newPost = {};
-
   newPost._id = new Date().toISOString();
+  newPost._attachments = {
+    filename: {                 //INSTEAD OF FILENAME, SHOULD NAME IT AS THE NAME OF THE FILE
+                                //ELSE CAN ONLY STORE 1 ATTACHMENT PER DOC BUT MAYBE CAN USE filename[i]
+      type: file.type,
+      data: file
+    }
+  };
+
   //name of org newPost.orgName = { { profile registered name? } }
   newPost.title = postings.title.value;
+  newPost.orgname = postings.orgname.value;
   newPost.skills = postings.skills.value;
   newPost.address = postings.address.value;
-  newPost.latlng = postings.latlng.value;
+  newPost.lat = postings.lat.value;
+  newPost.lng = postings.lng.value;
+  newPost.datetime = postings.datetime.value;
+  newPost.type = postings.type.value;
+//  newPost.attachment = postings.attachment.value;
+  newPost.description = postings.description.value;
+  newPost.deadline = postings.deadline.value;
+  newPost.application = postings.application.value;
+
 
   dbpostings.put(newPost, function(error, response) {
     if (!error) {
-      alert("post added");
+      //alert("post added");
       console.log('Added a new post');
+      alert('your post has been added');
     }
+//FOR SAVING ATTACHMENTS
+/*
+    if (response && response.ok) {
+
+      if (postings.attachment.files.length) {
+
+        var reader = new FileReader();
+        reader.readAsDataURL(postings.attachment.files.item(0));
+
+        // Using a closure so that we can extract the File's attributes in the function.
+        reader.onload = (function(file) {
+          return function(e) {
+            dbpostings.putAttachment(response.id, file.name, response.rev, e.target.result, file.type);
+          };
+        })(postings.attachment.files.item(0));
+
+      }
+
+    }
+*/
+
   });
 
   function syncError() {
-      alert("Unable to sync to remote");
-
       console.log('Unable to sync to remote');
   }
   function sync() {
@@ -176,7 +236,6 @@ addPost = function(event) {
     dbpostings.sync(remoteCouch, opts, syncError);
   }
   if(remoteCouch) {
-    alert("remote alert");
     sync();
   }
 
@@ -187,86 +246,6 @@ addPost = function(event) {
         //NOTE: ON CLICK, HIDE FORM, SHOW NOTICE THAT POST HAS BEEN ADDED AND PROVIDE A BUTTON TO TAKE THEM BACK TO HOME PG
 
       }
-
-
-
-//FOR MAIN.HTML
-
-
-      function displayIndividualPosts(x) {
-        var ul = document.getElementById("postDisplay");
-        x.forEach(function(y) {
-          ul.appendChild(createPost(y.doc));
-        });
-      }
-
-      /*
-      function createPost(z) {
-        //alert(z.title + z.latlng + z.type);
-        var li = document.createElement("li");
-        var header = document.createElement("h3");
-        var paragraph = document.createElement("p");
-        var span = document.createElement("span");
-        var divDisplay = document.createElement("div");
-        li.appendChild(header);
-        li.appendChild(divDisplay);
-        header.appendChild(document.createTextNode(z.title));
-        //for loop
-        divDisplay.appendChild(paragraph);
-        divDisplay.appendChild(span);
-        divDisplay.appendChild(paragraph);
-        paragraph.appendChild(document.createTextNode(z.skills));
-        span.appendChild(document.createTextNode(z.address));
-        paragraph.appendChild(document.createTextNode(z.latlng));
-
-        return li;
-      }
-      */
-
-      function createPost(z) {
-        var li = document.createElement("ion-item");
-        var header = document.createElement("h3");
-        var paragraph = document.createElement("p");
-        paragraph.className = "blue"; //http://stackoverflow.com/questions/1115310/how-to-add-a-class-to-dom-element-in-javascript
-        var span = document.createElement("span");
-          //clickable
-          var a = document.createElement('a');
-          var linkText = document.createTextNode("SEE MORE");
-          a.appendChild(linkText);
-          a.href = "newpost/post.html";
-        var divDisplay = document.createElement("div");
-        li.appendChild(header);
-        li.appendChild(divDisplay);
-        header.appendChild(document.createTextNode(z.title));
-        //for loop
-        divDisplay.appendChild(paragraph);
-        divDisplay.appendChild(span);
-        divDisplay.appendChild(paragraph);
-        divDisplay.appendChild(a);
-        paragraph.appendChild(document.createTextNode(z.skills));
-        span.appendChild(document.createTextNode(z.address));
-        paragraph.appendChild(document.createTextNode(z.latlng));
-
-        return li;
-      }
-
-
-
-
-      function displayAllPosts() {
-
-        dbpostings.allDocs({include_docs: true, descending: true}).then(function (doc) {
-          //alert(JSON.stringify(doc.rows));
-          alert('yes');
-          displayIndividualPosts(doc.rows);
-
-        }).catch(function(err){
-          console.log(err);
-        });
-
-      }
-
-      displayAllPosts();
 
 
     </script>

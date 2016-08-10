@@ -6,76 +6,777 @@
     <title></title>
 
     <link href="lib/ionic/css/ionic.css" rel="stylesheet">
-    <link href="css/style.css" rel="stylesheet">
-
-    <!-- IF using Sass (run gulp sass first), then uncomment below and remove the CSS includes above
-    <link href="css/ionic.app.css" rel="stylesheet">
-    -->
 
     <!-- ionic/angularjs js -->
     <script src="lib/ionic/js/ionic.bundle.js"></script>
+    <script src="lib/pouchdb/dist/pouchdb.min.js"></script>
+
     <script src="http://maps.googleapis.com/maps/api/js?key=AIzaSyA2u0eQNzCuDMdzG4opRM1ELacupQbzX28&sensor=true"></script>
 
     <!-- your app's js -->
-    <script src="js/app.js"></script>
     <!-- cordova script (this will be a 404 during development) -->
+    <script src="js/infobubble.js"></script>
+    <script src="js/jquery-3.1.0.min.js"></script>
+    <script src="tabs/map.js"></script>
     <script src="cordova.js"></script>
+
 
   </head>
 
-  <body>
+  <style>
+      #content {
+        line-height:1em;
+        font-size: 1.2em;
+        padding-right:20px;
+      }
 
-    <ion-pane>
+      #infoWindowTitle {
+        font-weight:bold;
+        font-size:1.2em;
+      }
+      #infoWindowOrgname {
+        color:rgb(117, 82, 82);
+      }
+      #infoWindowAddress{
 
-      <ion-content>
-        <div class="row home-description">
-          <div class="col">
-            <h1 class="appname text-center">Go<em>ld</em>Old</h1>
-            <p class="text-center">The platform that connects The platform that connects The platform that connects The platform that connects</p>
+      }
+      #infoWindowDatetime  {
+
+      }
+      #infoWindowType{
+        float:right;
+      }
+      #infoWindowDeadline {
+        float:right;
+      }
+
+      /*FOR OPPORTUNITIES DISPLAY PG*/
+      #listDisplay{
+
+      }
+      .posterImgClass{
+          height:120px;
+          margin:0 auto;
+          width:100%;
+      }
+      .listClass{
+          border: 1px solid grey;
+          margin:10px 10px;
+          border-radius:5px;
+      }
+
+      .divDisplayClass {
+          padding: 0 10px 10px 10px;
+      }
+
+      /*FOR SERVICES PG*/
+      .card-desc {
+          font-size:0.8em;
+          font-weight:bold;
+      }
+      body{
+          height:92%;
+      }
+  </style>
+
+	<body ng-app="starter">
+<!--
+    	<ion-content class="has-tabs">
+          <ion-nav-view></ion-nav-view>
+          <div class="tabs tabs-icon-top">
+              <a class="tab-item" ui-sref="home" nav-transition="none"><i class="icon ion-map"></i>Map</a>
+              <a class="tab-item" ui-sref="opportunities.posts" nav-transition="none"><i class="icon ion-ios-people"></i>Opportunities</a>
+              <a class="tab-item" ui-sref="care" nav-transition="none"><i class="icon ion-heart"></i>Care</a>
+              <a class="tab-item" ui-sref="settings.options" nav-transition="none"><i class="icon ion-gear-a"></i>Settings</a>
+              <a class="tab-item" ui-sref="search" nav-transition="none"><i class="icon ion-search"></i>Search</a>
           </div>
-        </div>
+	    </ion-content>
+-->
 
-        <form>
-          <div class="row">
-            <div class="col text-center">
-              <h3>Log In</h3>
-            </div>
-          </div>
-          <div class="list">
-            <label class="item item-input">
-              <span class="input-label">Username</span>
-              <input id="username" type="text">
-            </label>
-            <label class="item item-input">
-              <span class="input-label">Password</span>
-              <input type="password">
-            </label>
-          </div>
+			<ion-nav-view></ion-nav-view>
 
-          <div class="row">
-            <div class="col text-center">
-              <button id="" class="button button-positive">Enter</button>
-            </div>
-          </div>
-        </form>
+      <ion-tabs class="tabs-icon-top tabs-color-active-positive">
 
-        <div class="row">
-          <div class="col">
-            <div class="text-right">
-              Don't have an account? <a href="signup-user.html">Sign Up</a>
-            </div>
-            <div class="text-right">
-              <a href="org/login-org.html">Log In As An Admin</p></a>
-            </div>
-          </div>
-        </div>
-        <a href="main.html">Go to home page</a>
-        <a href="toggletest.html">Toggle Test</a>
+          <!-- Maps Tab -->
+          <ion-tab title="Map" icon-off="ion-map" icon-on="ion-map-strong" ui-sref="home">
+          </ion-tab>
+
+          <!-- Opportunities Tab -->
+          <ion-tab title="Opportunities" icon-off="ion-ios-people" icon-on="ion-ios-people" ui-sref="opportunities.posts">
+          </ion-tab>
+
+          <!-- Care Tab -->
+          <ion-tab title="Services" icon-off="ion-heart" icon-on="ion-heart" ui-sref="care">
+          </ion-tab>
+
+          <!-- Settings Tab -->
+          <ion-tab title="Settings" icon-off="ion-ios-gear-outline" icon-on="ion-ios-gear" ui-sref="settings.options">
+          </ion-tab>
+
+          <!-- Search Tab -->
+          <ion-tab title="Search" icon-off="ion-search" icon-on="ion-search" ui-sref="search">
+          </ion-tab>
+
+      </ion-tabs>
+
+    	<script>
+
+var dbpostings = new PouchDB('postings');
+var remoteCouch = "http://localhost:5984/postings";
+
+var myMain = angular.module('starter', ['ionic']);
+
+myMain.run(function($ionicPlatform) {
+  $ionicPlatform.ready(function() {
+    if(window.cordova && window.cordova.plugins.Keyboard) {
+      // Hide the accessory bar by default (remove this to show the accessory bar above the keyboard
+      // for form inputs)
+      cordova.plugins.Keyboard.hideKeyboardAccessoryBar(true);
+
+      // Don't remove this line unless you know what you are doing. It stops the viewport
+      // from snapping when text inputs are focused. Ionic handles this internally for
+      // a much nicer keyboard experience.
+      cordova.plugins.Keyboard.disableScroll(true);
+    }
+    if(window.StatusBar) {
+      StatusBar.styleDefault();
+    }
+  });
+})
 
 
-      </ion-content>
 
-    </ion-pane>
+myMain.config(function($stateProvider, $urlRouterProvider, $ionicConfigProvider) {
+    $ionicConfigProvider.tabs.position('bottom');
+    $stateProvider
+        .state('home', {
+            url: '/', //TO CHECK WHETHER THIS IS CORRECT
+            templateUrl: 'tabs/map.html',
+            controller: 'MapCtrl'
+        })
 
-  </body>
+        .state('opportunities', {
+        	url: '/opportunities',
+        	templateUrl: 'tabs/opportunities.html'
+        })
+
+        .state('opportunities.posts', {
+        	url: '/posts',
+        	templateUrl: 'tabs/opportunities.posts.html', //templateUrl: 'posts.html',
+          resolve: {
+            posts: ['posts', function (posts) {
+              //resolve db.getAttachment(doc,filename).then(function(blob) {}); here
+              return posts.all();
+            }]
+          },
+          controller: 'OpportunitiesController' //I NEED VALUES HERE THAT ARE MAYBE... FROM MY DATABASE,
+                              //TO BE DISPLAYED IN MY TEMPLATE
+        })
+
+        .state('care', {
+        	url: '/care',
+        	templateUrl: 'tabs/care.html',
+        	controller: function() {
+              function onload() {
+                  document.addEventListener("deviceready", onDeviceReady, false);
+              }
+              function onDeviceReady() {
+                  window.open = cordova.InAppBrowser.open;
+              }
+              document.getElementById('eCare').onclick=function(){
+                  cordova.InAppBrowser.open('https://www.silverpages.sg/tools/e-care-locator', '_blank', 'location=yes');
+              }
+              document.getElementById('skillsFutureWeb').onclick=function(){
+                  cordova.InAppBrowser.open('http://www.skillsfuture.sg/programmes-and-initiatives.html', '_blank', 'location=yes');
+              }
+
+              document.getElementById('skillsFutureWebST').onclick=function(){
+                  cordova.InAppBrowser.open('http://www.straitstimes.com/tags/skillsfuture', '_blank', 'location=yes');
+              }
+              onload();
+        	}
+        })
+
+        .state('settings', {
+        	url: '/settings',
+        	templateUrl: 'tabs/settings.html'
+        	/*abstract: true*/
+        })
+
+        .state('settings.options', {
+          url: '/options',
+          views: {
+              'preferencesOpptype': {
+                templateUrl: 'tabs/settings-preferences-opptype.html'
+                //controller:
+              },
+              'sortBy': {
+                templateUrl: 'tabs/settings-sortby.html'
+              },
+              'preferences': {
+                templateUrl: 'tabs/settings-preferences.html',
+                resolve: {
+                  posts: ['posts', function (posts) {
+                    return posts.all();
+                  }]
+                },
+                controller: 'SettingsController'
+              }
+
+          }
+        })
+
+        .state('search', {
+        	url: '/search',
+        	templateUrl: 'tabs/search.html'
+        })
+
+        .state('opportunities.post-detail', {
+            url: "/:postId", //represents a parameter that will be passed into our controller
+            templateUrl: "tabs/opportunities.post-detail.html",
+
+            //on how to use resolve, https://github.com/angular-ui/ui-router/wiki#resolve
+            resolve: {
+                docdetail: function($stateParams) {
+                    var doc = $stateParams.postId;
+
+                    //maybe do a sync to pull data from remoteCouch to dbpostings here
+                    function syncError() {
+                        console.log('Unable to sync with remote');
+                        //alert('error here');
+                    }
+                    function sync() {
+                      var opts = {live: true};
+                      dbpostings.sync(remoteCouch, opts, syncError);
+                      //alert(remoteCouch);
+                    }
+                    if(remoteCouch) {
+                      //alert('hi we here');
+                      sync();
+                    }
+                    return dbpostings.get(doc).then(function (resp) {
+                        //alert('return');
+                        //alert(resp.title);
+                        return resp;
+                    }).catch(function (err) {
+                      console.log(err);
+                    });
+                }
+            },
+            //get the document that has the clicked id, and I want to display all details of only
+            //that doc
+            controller: function ($scope, docdetail, $ionicHistory) {
+                function onload() {
+                    document.addEventListener("deviceready", onDeviceReady, false);
+                }
+
+                function onDeviceReady() {
+                    window.open = cordova.InAppBrowser.open;
+                }
+                document.getElementById('openUrl').onclick=function(){
+                    cordova.InAppBrowser.open(docdetail.url, '_blank', 'location=yes');
+                }
+
+                onload();
+
+
+                $scope.docdetail = docdetail;
+                if(docdetail.url != "") {
+                    document.getElementById('url').style.display = 'block';
+                }
+                if(docdetail.aboutOrg != "") {
+                    document.getElementById('aboutOrg').style.display = 'block';
+                }
+                if(docdetail.deadline != "") {
+                    document.getElementById('mainDeadline').style.display = 'block';
+                }
+                if(docdetail.skills != "") {
+                    document.getElementById('skillsBox').style.display = 'block';
+                }
+                if(docdetail.type == "Work") {
+                    document.getElementById('mainType').style.display = 'block';
+                    document.getElementById('mainTypeImg').src = "img/images.png";
+                } else if(docdetail.type == "Volunteer") {
+                    document.getElementById('mainType').style.display = 'block';
+                    document.getElementById('mainTypeImg').src = "img/helping-hands.jpg";
+                }
+                dbpostings.getAttachment(docdetail._id, "filename").then(function(blob) {
+                    var url = URL.createObjectURL(blob);
+                    document.getElementById("posterImg").src= url;
+                }).catch(function (err) {
+                  console.log(err);
+                });
+                document.getElementById('backButton').onclick=function() {
+                    $ionicHistory.goBack();
+                }
+
+
+                //GOOGLE MAPS CODE
+                /*
+                google.maps.event.addDomListener(window, 'load', function() {
+                */
+                    //alert('in here');
+                    var myLatlng = new google.maps.LatLng(1.3549256922034412, 103.86809349060059);
+                    var mapOptions = {
+                        center: myLatlng,
+                        zoom: 14,
+                        mapTypeId: google.maps.MapTypeId.ROADMAP
+                    };
+                    var map = new google.maps.Map(document.getElementById("mapPostDetail"), mapOptions);
+                    $scope.map = map;
+
+                    map.setCenter(new google.maps.LatLng(docdetail.lat, docdetail.lng));
+                    var myLocation = new google.maps.Marker({
+                      position: new google.maps.LatLng(docdetail.lat, docdetail.lng),
+                      map: map,
+                      title: "My Location"
+                    });
+                /*
+                });
+                */
+
+            }
+        });
+
+    $urlRouterProvider.otherwise('/');
+});
+
+
+myMain.factory('posts', ['$http', function($http) {
+  function syncError() {
+      console.log('Unable to sync with remote');
+  }
+  function sync() {
+      var opts = {live: true};
+      //dbpostings.sync(remoteCouch, opts, syncError);
+      //dbpostings.replicate.from(remoteCouch, opts, syncError);
+      PouchDB.replicate(remoteCouch, dbpostings, opts);
+  }
+  if(remoteCouch) {
+      sync();
+  }
+
+
+/* var path = 'http://localhost:5984/postings/_all_docs?limit=20&include_docs=true';
+  var posts = $http.get(path).then(function(response) {
+      return response.data.rows;
+  });
+*/
+  var factory = {};
+
+  factory.all = function() {
+  var postsDB = dbpostings.allDocs({include_docs: true, attachments: true}).then(function(result) {
+      //do something with the result
+      //alert(result.rows);
+      return result.rows;
+  }).catch(function (err) {
+      console.log(err);
+  });
+
+    //or do db.getAttachment(doc,filename).then(function(blob) {}); here
+    //for the total no. of docs
+/*
+    dbpostings.info().then(function(result) {
+      var totalDocs = result.doc_count;
+      var i=0, idVar;
+      for(i=0; i<totalDocs; i++) {
+        //get the id of each doc and store into idVar.
+        //run dbpostings.getAttachment(idVar, "filename").
+        //ERROR - Note that this will append all imgs only to the first imageBox
+        //maybe could run another for loop with var j, imageBox[j], but imageBox is not an array
+
+      }
+    }).catch(function (err) {
+      console.log(err);
+    });
+
+
+    var idVar = "2016-07-31T07:07:38.702Z";
+    dbpostings.getAttachment(idVar, "filename").then(function(blob) {
+        var url = URL.createObjectURL(blob);
+        var img = document.createElement('img');
+        img.src = url;
+        document.getElementById('imageBox').appendChild(img);
+    }).catch(function (err) {
+        console.log(err);
+    });
+*/
+
+    //return posts;
+
+    //instead of returning posts from 'http://localhost:5984/postings/_all_docs?limit=20&include_docs=true',
+    //return posts from dbpostings so that I could get the attachment data to insert
+    //set attachments:true under dbpostings.get
+
+    return postsDB;
+  };
+
+  return factory;
+}]);
+
+myMain.controller("OpportunitiesController", ['$scope', 'posts', '$state', function($scope, posts, $state) {
+  /*REFRESH ATTEMPT
+  $scope.doRefresh = function() {
+
+    $http.get('/new-items')
+     .success(function(newItems) {
+       //$scope.items = newItems;
+     })
+     .finally(function() {
+       // Stop the ion-refresher from spinning
+       $scope.$broadcast('scroll.refreshComplete');
+     });
+
+  };
+  */
+    //$scope.posts = posts;
+    //document.getElementById('listDisplay').style.paddingBottom = '30px';
+
+
+    for(var i=0; i<posts.length; i++) {
+
+        var post = posts[i];
+        var docId = post.doc._id;
+
+        dbpostings.get(docId, {attachments:true}).then(function(doc) {
+            var dataToPass = doc._attachments['filename'].data;
+            var posterImg = document.createElement('img');
+            posterImg.setAttribute('class', 'posterImgClass');
+            posterImg.src = 'data:image/jpeg;base64,' + dataToPass + '';
+
+            var liItem = document.createElement("li");
+            liItem.setAttribute('class', 'listClass');
+            liItem.appendChild(posterImg);
+
+            //create a divDisplay.
+            var divDisplay = document.createElement('div');
+            divDisplay.setAttribute('class', 'divDisplayClass');
+
+            //append the title to divDisplay.
+            var title = document.createElement('div');
+            title.innerHTML = doc.title;
+            divDisplay.appendChild(title);
+
+            //append the orgName to divDisplay
+            var orgName = document.createElement('div');
+            orgName.innerHTML = doc.orgname;
+            divDisplay.appendChild(orgName);
+
+            //append the dateTime to divDisplay
+            var dateTime = document.createElement('div');
+            dateTime.innerHTML = doc.datetime;
+            divDisplay.appendChild(dateTime);
+
+            //append the address to divDisplay
+            var address = document.createElement('div');
+            address.innerHTML = doc.address;
+            divDisplay.appendChild(address);
+
+            //append the type to divDisplay
+            var type = document.createElement('div');
+            type.innerHTML = doc.type;
+            divDisplay.appendChild(type);
+
+
+            //then append divDisplay to liItem.
+            liItem.appendChild(divDisplay);
+
+
+            addListenerFunction(liItem, doc._id);
+            appendPostToList(liItem);
+
+        }).catch(function (err) {
+            console.log(err);
+        });
+
+        function appendPostToList(content) {
+            document.getElementById('listDisplay').appendChild(content);
+        }
+    }
+
+    function addListenerFunction(liItem, id) {
+        liItem.addEventListener('click', function() {
+            //alert(post.doc._id);
+            $state.go('opportunities.post-detail', {postId: id});
+        });
+    }
+
+/*
+    function passToGetAttachment() {
+        alert(docId);
+
+        dbpostings.getAttachment(docId, "filename").then(function(blob) {
+
+            //for some reason the 5 docId passed to this .getAttachment() mtd are the same last one.
+            //this means this mtd only runs at the end of whatever function/loop it's in. wtf?
+            //I think if I want to use this method I must then manually do a dbpostings.getAttachment function every time a post is added i.e. I cannot put this in any loop or function. If there are 100 posts, I must come into this file and write .getAttachment 100 times.
+            alert(docId);
+            var type = document.createElement('div');
+            type.innerHTML = post.doc.type;
+            //alert(post.doc.type);
+            passOut(type); //I'm only passing out the type of the last post
+
+//          var url = URL.createObjectURL(blob);
+//          var posterImg = document.createElement("img");
+//          posterImg.src = url;
+//          liItem.appendChild(posterImg);
+
+            //var nextLink = $state.go('opportunities.post-detail', {postId: post.doc._id});
+            //var postContent = "<li onclick='" + nextLink + "'><img id='testonly' src='" + url + "'></li>" + ""; //ERROR: var postContent must be of type Node
+        }).catch(function (err) {
+            console.log(err);
+        });
+    }
+    function passOut(type) {
+        liItem.appendChild(type);
+    }
+*/
+
+}]);
+
+
+myMain.controller("SettingsController", ['$scope', 'posts', function($scope, posts) {
+
+    changeOppTypeDisplay = function(){
+        var oppType = document.getElementById("oppType");
+        var selectedValue = oppType.options[oppType.selectedIndex].value;
+
+        //1. Communicate through the posts factory?
+        //Is it possible to change the code of the posts factory and cause the OpportunitiesController and MapCtrl to reload?
+        //http://stackoverflow.com/questions/30680095/move-some-code-from-controller-to-factory-in-angular
+
+        posts.forEach(function(y) {
+            alert(y.doc._id);
+            if(y.doc.type != selectedValue) {
+                alert(dbpostings);
+                dbpostings.remove(y.doc); //causes sync and doc to be also deleted from remoteCouch Server
+            }
+            //alert(dbpostings.rows);
+        });
+/*
+        var postsOppType = dbpostings.allDocs({include_docs: true, attachments: true}).then(function(result) {
+            return result.rows;
+        }).catch(function (err) {
+            console.log(err);
+        });
+
+        $scope.postsOppType = posts;
+        alert($scope.postsOppType);
+        //posts.all($scope.postsOppType);
+*/
+        //2. change $scope value of OpportunitiesController/MapCtrl from this controller
+
+    };
+
+}]);
+
+//UNABLE TO PLACE ALL MY MAPS CODE IN TABS/MAP.JS
+function onload() {
+	document.addEventListener("deviceready", onDeviceReady, false);
+}
+
+function onDeviceReady() {}
+
+//FETCHING AND DISPLAYING MARKERS FROM MY DATABASE
+myMain.factory('Markers', function ($http) {
+  var markers = [];
+
+  return {
+    getMarkers: function(){
+      return $http.get("http://localhost:5984/postings/_all_docs?limit=20&include_docs=true").then(function(response){
+          markers = response.data.rows;
+          return markers;
+      });
+    }
+  }
+});
+
+
+myMain.controller('MapCtrl', function($scope, Markers, $state) {
+
+    //1. Get user's location, center the map.
+    google.maps.event.addDomListener(window, 'load', function() {
+        var myLatlng = new google.maps.LatLng(1.3549256922034412, 103.86809349060059);
+        var mapOptions = {
+            center: myLatlng,
+            zoom: 14,
+            mapTypeId: google.maps.MapTypeId.ROADMAP
+        };
+        var map = new google.maps.Map(document.getElementById("map"), mapOptions);
+        $scope.map = map;
+
+        //Get User's location
+        var onSuccess = function(position) {
+          map.setCenter(new google.maps.LatLng(position.coords.latitude, position.coords.longitude));
+          var myLocation = new google.maps.Marker({
+            position: new google.maps.LatLng(position.coords.latitude, position.coords.longitude),
+            map: map,
+            title: "My Location"
+          });
+        };
+
+        function onError(error) {
+            alert('code: '    + error.code    + '\n' +
+                  'message: ' + error.message + '\n');
+        }
+
+        var options = {maximumAge: 0, timeout: 10000, enableHighAccuracy:true};
+        navigator.geolocation.getCurrentPosition(onSuccess, onError, options);
+
+        google.maps.event.addListenerOnce($scope.map, 'idle', function(){
+            loadMarkers();
+        });
+
+
+
+        //2. loadMarkers - 4 parts
+        //(a)find user's location and pass into next function
+        //(b)load each marker using for loop from database containing all records, and add to map
+        //(c)run the distance matrix service to pass distance/duration etc, along with the current record and marker, into a function of a to-be-created infoBubble
+        //(d)display infoBubble when marker is clicked and route to the next pg upon clicking that infoBubble
+
+        function loadMarkers(){
+            //2(a)
+            function onError(error) {alert('code: '    + error.code    + '\n' + 'message: ' + error.message + '\n');}
+            var options = {maximumAge: 0, timeout: 10000, enableHighAccuracy:true};
+            navigator.geolocation.getCurrentPosition(onSuccess, onError, options);
+
+            function onSuccess(position) {
+                var userLoc = new google.maps.LatLng(position.coords.latitude, position.coords.longitude);
+                //var userLoc = new google.maps.LatLng(1.3360910507988086, 103.91075134277344);
+                loadMarkers2(userLoc);
+            }
+
+            //2(b)
+            function loadMarkers2(userLoc) {
+                //2bi: retrieve each record containing the marker
+                Markers.getMarkers().then(function(markers){
+                    var records = markers;
+                    for (var i = 0; i < records.length; i++) {
+                        var record = records[i];
+
+                        //2bii: Add the marker to the map
+                        var markerPos = new google.maps.LatLng(record.doc.lat, record.doc.lng);
+                        var marker = new google.maps.Marker({
+                          map: map,
+                          animation: google.maps.Animation.DROP,
+                          position: markerPos //event.latLng?
+                        });
+
+                        var destination = record.doc.address; //Notes: FOR G MAPS DISTANCE MATRIX - get the latlng value from database, from the particular doc. var destination = "(" + record.doc.lat + ", " + record.doc.lng + ")"; - FAILS: in property location: not a LatLng or LatLngLiteral: not an Object. var destination = "(1.3716722389317273, 103.88294219970703)"; - FAILS TOO; MUST BE CODED. //var destination = new google.maps.LatLng(record.doc.lat, record.doc.lng);
+                        loadMarkers3(marker, destination, record);
+
+                        //2(c)
+                        function loadMarkers3(marker, destination, record) {
+                            //2ci: Run the distance matrix service - find distance and duration from marker to userLoc
+                            var service = new google.maps.DistanceMatrixService();
+                            service.getDistanceMatrix(
+                              {
+                                origins: [userLoc],
+                                destinations: [destination], //NOT NECESSARY TO GEOCODE AFTER ALL. var geocoder = new google.maps.Geocoder; geocoder.geocode({'location': userLoc}, function(results, status) {if (status === 'OK') {var formattedLoc1 = results[0].formatted_address;console.log(formattedLoc1);} else {console.log('Geocoder failed due to: ' + status);}}); geocoder.geocode({'location': destination}, function(results, status) {if (status === 'OK') {var formattedLoc1 = results[0].formatted_address;console.log(formattedLoc1);} else {console.log('Geocoder failed due to: ' + status);}});
+                                travelMode: 'TRANSIT'
+                              }, callback);
+                            var userTravelMode = "PUBLIC TRANSPORT"; //depends on what mode they select
+
+                            function callback(response, status) {
+                                //alert(destination); //SUCCESSFULLY LOADS ALL DATABASE ADDRESSES
+                                if (status == 'OK') {
+                                  var origins = response.originAddresses;
+                                  var destinations = response.destinationAddresses;
+
+                                  for (var j = 0; j < origins.length; j++) {
+                                      var results = response.rows[j].elements;
+
+                                      for (var k = 0; k < results.length; k++) {
+                                        var element = results[k];
+                                        var distance, duration;
+                                        distance = element.distance.text;
+                                        duration = element.duration.text;
+                                        /*
+                                        document.getElementById('random').innerHTML = "It takes me <b>"+duration+ "</b> to go <b>"+distance+"</b> from <u>"+origins[k]+"</u> to <u>"+destinations[k]+"</u> by <b>"+userTravelMode+"</b>.";
+                                        */
+                                        //2cii: Pass relevant data obtained from distance matrix, along with record and marker, to infoBubble
+                                        addInfoBubble(marker, distance, duration, record);
+                                      }
+                                  }
+
+                                } else {
+                                  console.log('there is an error in the callback to the service.getDistanceMatrix.');
+                                }
+                                //the value of distance is available until here, within the callback function
+                            };
+
+                        }
+
+                    }// for loop ends
+
+                });
+            }
+
+            //2(d)
+            function addInfoBubble(marker, distance, duration, record) {
+                var infoBubble = new InfoBubble({
+                    minWidth: 250,
+                    maxWidth: 250,
+                    minHeight: 100,
+                    borderRadius: 0,
+                    borderWidth: 5,
+                    borderColor: 'rgb(84, 9, 9)',
+                    content: "",
+                    distance: distance,
+                    duration: duration
+                });
+                infoBubble.content =
+                    "<div id='infoBubble'>" +
+                        "<div id='content'>" +
+                            "<p id='infoWindowTitle'>" + record.doc.title +
+                            "</p><p id='infoWindowOrgname'>" + record.doc.orgname +
+                            "</p><p id='infoWindowDeadline'>" + record.doc.deadline +
+                            "</p><p id='infoWindowAddress'>" + record.doc.address +
+                            "</p><p id='infoWindowType'>" + record.doc.type +
+                            "</p><p id='infoWindowDatetime'>" + record.doc.datetime +
+                            "</p><p id='distanceReturned'>" + infoBubble.distance +
+                            "</p><p id='durationReturned'>" + infoBubble.duration +
+                            "</p>" +
+                        "</div>" +
+                    "</div>";
+
+                google.maps.event.addListener(marker, 'click', function() {
+                    //alert(marker.position);
+                    infoBubble.open(map, marker);//the marker I would open is the marker at the latlng where I clicked
+
+                });
+
+                //2d. go to next pg onclick infoBubble
+                google.maps.event.addDomListener(infoBubble.bubble_, 'click', function() {
+                    //if user clicks on close button, info bubble will close.
+                    //Only if infoBubble is still open after user clicks on it (which means user did not click on the close button, route to the next page
+                    if(infoBubble.isOpen_ == true) {
+                      $state.go('opportunities.post-detail', {postId: record.doc._id});
+                    }
+                }); //http://stackoverflow.com/questions/12368902/google-maps-api-event-listener-for-infobubble-doesnt-work
+
+            }
+        }
+
+    });
+});
+
+myMain.controller('refresher', function($scope, $http) {
+  $scope.doRefresh = function() {
+    $http.get('/new-items')
+     .success(function(newItems) {
+       //$scope.items = newItems;
+     })
+     .finally(function() {
+       // Stop the ion-refresher from spinning
+       $scope.$broadcast('scroll.refreshComplete');
+     });
+  };
+});
+
+
+    	</script>
+    </body>
 </html>
+

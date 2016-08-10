@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html ng-app="loginUser">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=no, width=device-width">
+    <title></title>
+
+    <link href="lib/ionic/css/ionic.css" rel="stylesheet">
+    <link href="css/style.css" rel="stylesheet">
+
+    <!-- IF using Sass (run gulp sass first), then uncomment below and remove the CSS includes above
+    <link href="css/ionic.app.css" rel="stylesheet">
+    -->
+
+    <!-- ionic/angularjs js -->
+    <script src="lib/ionic/js/ionic.bundle.js"></script>
+
+    <!-- your app's js -->
+    <script src="app.module.js"></script>
+    <script src="login-user/login-user.module.js"</script>
+    <script src="login-user/login-user.component.js"</script>
+    <!-- cordova script (this will be a 404 during development) -->
+    <script src="cordova.js"></script>
+
+  </head>
+
+  <body>
+
+    <ion-pane>
+
+      <ion-content>
+        <div class="row home-description">
+          <div class="col">
+            <h1 class="appname text-center">Go<em>ld</em>Old</h1>
+            <p class="text-center">The platform that connects The platform that connects The platform that connects The platform that connects</p>
+          </div>
+        </div>
+
+<!--User Login begins here -->
+<!--how to do user login with pouchDB; upon clicking submit, if form validation passes,
+if login is successful upon checking with database (?), proceed to index.html
+-->
+        <login-form></login-form>
+<!--
+
+-->
+        <div class="row">
+          <div class="col">
+            <div class="text-right">
+              Don't have an account? <a href="signup-user.html">Sign Up</a>
+            </div>
+            <div class="text-right">
+              <a href="org/login-org.html">Log In As An Admin</p></a>
+            </div>
+          </div>
+        </div>
+<!--
+        <a href="main.html">Go to home page</a>
+        <a href="toggletest.html">Toggle Test</a>
+-->
+
+      </ion-content>
+
+    </ion-pane>
+
+  </body>
+</html>

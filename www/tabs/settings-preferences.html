@@ -1,0 +1,52 @@
+<ion-view title='preferences-opptype'>
+	<ion-content>
+    <h4 style='text-align:center;'>Preferences</h4>
+
+		<label class="item item-input item-select">
+            <div class="input-label">
+              Display opportunities:
+            </div>
+            <select id='oppType' onchange="changeOppTypeDisplay()">
+              <option value='Work'>Work</option>
+              <option value='Volunteer'>Volunteer</option>
+              <option value='all' selected>ALL</option>
+            </select>
+		</label>
+
+
+    <label class="item item-input item-select">
+        <div class="input-label">
+          Sort by:
+        </div>
+        <select>
+          <option></option>
+          <option selected>Proximity</option>
+        </select>
+
+    </label>
+
+    <h4 style='text-align:center; padding-top:20px;'>Profile</h4>
+
+    <div class="card" id=''>
+        <div class="item item-text-wrap">
+
+            <div class="row">
+                <div class="col">
+                    <p class='card-desc' style='text-align:justify;'>
+                        <span><i class="icon ion-alert-circled"></i></span>
+                        You are not logged in! Your account enables you to apply for work and volunteer opportunities near you easily through the map, allow you to access more services, and more.
+                    </p>
+                </div>
+            </div>
+
+            <div class='row'>
+                <div class='col'>
+                    <button class="button button-small button-positive">Log In</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    </ion-content>
+</ion-view>

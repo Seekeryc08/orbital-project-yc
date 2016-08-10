@@ -28,20 +28,12 @@ function onload() {
 
 }
 
-
-
-
-
-
-
-
-
 /* IF I COMMENT MY MAP CONTROLLER FUNCTION OUT, THE SUBMIT EVENT WORKS (http://localhost:8100/org/newpost.html?title=woo&skills=&address=&latlng=&datetime=&type=Volunteer&description=&deadline=&application=Yes)
                                               , BUT DATA DOES NOT GET STORED IN ANY DATABASE.
 
 */
-newPostApp.controller('MapController', function($scope) {
 
+newPostApp.controller('MapController', function($scope) {
 
 		google.maps.event.addDomListener(window, 'load', function() {
 
@@ -81,19 +73,22 @@ newPostApp.controller('MapController', function($scope) {
 				});
 			}
 
-			// This event listener calls addMarker() when the map is clicked.
 			google.maps.event.addListener(map, 'click', function (event) {
 				addMarker(event.latLng, map);
-				//Convert marker into address
-				//https://developers.google.com/maps/documentation/javascript/geocoding#quotas
-				//alert("" + event.formatted_address + "");
-				document.getElementById('postingForm').latlng.value = event.latLng;
+				document.getElementById('postingForm').lat.value = event.latLng.lat();
+				document.getElementById('postingForm').lng.value = event.latLng.lng();
+        var geocoder = new google.maps.Geocoder;
+        geocoder.geocode({'location': event.latLng}, function(results, status) {
+            if (status === 'OK') {
+                var addressString = results[0].formatted_address;
+                postings.address.value = addressString;
+            } else {
+                console.log('Geocoder failed due to: ' + status);
+            }
+        });
 			});
-			//posting.location = event.latLng;
-			// I need to get event.latLng into my database
 
 		});
-
 
 });
 
