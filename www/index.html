@@ -16,6 +16,7 @@
     <!-- your app's js -->
     <!-- cordova script (this will be a 404 during development) -->
     <script src="js/infobubble.js"></script>
+    <script src="js/jquery-3.1.0.min.js"></script>
     <script src="tabs/map.js"></script>
     <script src="cordova.js"></script>
 
@@ -47,6 +48,34 @@
       }
       #infoWindowDeadline {
         float:right;
+      }
+
+      /*FOR OPPORTUNITIES DISPLAY PG*/
+      #listDisplay{
+
+      }
+      .posterImgClass{
+          height:120px;
+          margin:0 auto;
+          width:100%;
+      }
+      .listClass{
+          border: 1px solid grey;
+          margin:10px 10px;
+          border-radius:5px;
+      }
+
+      .divDisplayClass {
+          padding: 0 10px 10px 10px;
+      }
+
+      /*FOR SERVICES PG*/
+      .card-desc {
+          font-size:0.8em;
+          font-weight:bold;
+      }
+      body{
+          height:92%;
       }
   </style>
 
@@ -146,7 +175,26 @@ myMain.config(function($stateProvider, $urlRouterProvider, $ionicConfigProvider)
 
         .state('care', {
         	url: '/care',
-        	templateUrl: 'tabs/care.html'
+        	templateUrl: 'tabs/care.html',
+        	controller: function() {
+              function onload() {
+                  document.addEventListener("deviceready", onDeviceReady, false);
+              }
+              function onDeviceReady() {
+                  window.open = cordova.InAppBrowser.open;
+              }
+              document.getElementById('eCare').onclick=function(){
+                  cordova.InAppBrowser.open('https://www.silverpages.sg/tools/e-care-locator', '_blank', 'location=yes');
+              }
+              document.getElementById('skillsFutureWeb').onclick=function(){
+                  cordova.InAppBrowser.open('http://www.skillsfuture.sg/programmes-and-initiatives.html', '_blank', 'location=yes');
+              }
+
+              document.getElementById('skillsFutureWebST').onclick=function(){
+                  cordova.InAppBrowser.open('http://www.straitstimes.com/tags/skillsfuture', '_blank', 'location=yes');
+              }
+              onload();
+        	}
         })
 
         .state('settings', {
@@ -226,7 +274,6 @@ myMain.config(function($stateProvider, $urlRouterProvider, $ionicConfigProvider)
                     window.open = cordova.InAppBrowser.open;
                 }
                 document.getElementById('openUrl').onclick=function(){
-                    alert('i am click');
                     cordova.InAppBrowser.open(docdetail.url, '_blank', 'location=yes');
                 }
 
@@ -367,7 +414,7 @@ myMain.factory('posts', ['$http', function($http) {
   return factory;
 }]);
 
-myMain.controller("OpportunitiesController", ['$scope', 'posts', function($scope, posts) {
+myMain.controller("OpportunitiesController", ['$scope', 'posts', '$state', function($scope, posts, $state) {
   /*REFRESH ATTEMPT
   $scope.doRefresh = function() {
 
@@ -382,62 +429,61 @@ myMain.controller("OpportunitiesController", ['$scope', 'posts', function($scope
 
   };
   */
-    $scope.posts = posts;
-
-/*
-    dbpostings.info().then(function(result) {
-      var totalDocs = result.doc_count;
-      var i=0, idVar;
-      for(i=0; i<totalDocs; i++) {
-
-          var idVar = "2016-07-31T21:42:07.924Z"; //1. Get the Id for each doc
-          document.getElementById('imageBox').setAttribute("class", "img-class-"+i);
-
-          dbpostings.getAttachment(idVar, "filename").then(function(blob) { //blob is unique to this doc id
-
-              var url = URL.createObjectURL(blob);
-              var img = document.createElement('img'); //2. Instead of creating this, why not document.getElementById of a certain img in my template, and in the next step attach .src = url to it?
-              img.src = url;
-              img.setAttribute("id", idVar);
-              img.setAttribute("class", "img-class-set");
-              //use the appendChild(img) mtd to append each of the imgs to somewhere - not imageBox
-              //all images are inevitably appended to the same div
-              document.getElementById('hello').appendChild(img);
+    //$scope.posts = posts;
+    //document.getElementById('listDisplay').style.paddingBottom = '30px';
 
 
-              //need to retrieve the images - one img at a time- from this div to be appended into imageBox
-
-              //fails because unable to detect.
-              //var y = document.getElementById("hello").querySelector("img-class-set");
-              //alert(y);
-              //img.removeAttribute("class");
-              //var x = document.getElementById("imageBox").getAttribute("class");
-              //alert(x);
-
-
-              //document.getElementById('hello').querySelector('.img-class-j')
-          }).catch(function (err) {
-              console.log(err);
-          });
-
-      }
-    }).catch(function (err) {
-      console.log(err);
-    });
-*/
-/*
     for(var i=0; i<posts.length; i++) {
-        //alert(posts.length);
-        var post = posts[i];
-        //alert(post.doc.title);
-        var docId = post.doc._id;
-        //alert(dbpostings);
-        dbpostings.getAttachment(docId, "filename").then(function(blob) {
-            //alert('got into this');
-            var url = URL.createObjectURL(blob);
-            var postContent = "<img src='" + url + "'>" + ""; //ERROR: var postContent must be of type Node
 
-            appendPostToList(postContent);
+        var post = posts[i];
+        var docId = post.doc._id;
+
+        dbpostings.get(docId, {attachments:true}).then(function(doc) {
+            var dataToPass = doc._attachments['filename'].data;
+            var posterImg = document.createElement('img');
+            posterImg.setAttribute('class', 'posterImgClass');
+            posterImg.src = 'data:image/jpeg;base64,' + dataToPass + '';
+
+            var liItem = document.createElement("li");
+            liItem.setAttribute('class', 'listClass');
+            liItem.appendChild(posterImg);
+
+            //create a divDisplay.
+            var divDisplay = document.createElement('div');
+            divDisplay.setAttribute('class', 'divDisplayClass');
+
+            //append the title to divDisplay.
+            var title = document.createElement('div');
+            title.innerHTML = doc.title;
+            divDisplay.appendChild(title);
+
+            //append the orgName to divDisplay
+            var orgName = document.createElement('div');
+            orgName.innerHTML = doc.orgname;
+            divDisplay.appendChild(orgName);
+
+            //append the dateTime to divDisplay
+            var dateTime = document.createElement('div');
+            dateTime.innerHTML = doc.datetime;
+            divDisplay.appendChild(dateTime);
+
+            //append the address to divDisplay
+            var address = document.createElement('div');
+            address.innerHTML = doc.address;
+            divDisplay.appendChild(address);
+
+            //append the type to divDisplay
+            var type = document.createElement('div');
+            type.innerHTML = doc.type;
+            divDisplay.appendChild(type);
+
+
+            //then append divDisplay to liItem.
+            liItem.appendChild(divDisplay);
+
+
+            addListenerFunction(liItem, doc._id);
+            appendPostToList(liItem);
 
         }).catch(function (err) {
             console.log(err);
@@ -447,7 +493,45 @@ myMain.controller("OpportunitiesController", ['$scope', 'posts', function($scope
             document.getElementById('listDisplay').appendChild(content);
         }
     }
+
+    function addListenerFunction(liItem, id) {
+        liItem.addEventListener('click', function() {
+            //alert(post.doc._id);
+            $state.go('opportunities.post-detail', {postId: id});
+        });
+    }
+
+/*
+    function passToGetAttachment() {
+        alert(docId);
+
+        dbpostings.getAttachment(docId, "filename").then(function(blob) {
+
+            //for some reason the 5 docId passed to this .getAttachment() mtd are the same last one.
+            //this means this mtd only runs at the end of whatever function/loop it's in. wtf?
+            //I think if I want to use this method I must then manually do a dbpostings.getAttachment function every time a post is added i.e. I cannot put this in any loop or function. If there are 100 posts, I must come into this file and write .getAttachment 100 times.
+            alert(docId);
+            var type = document.createElement('div');
+            type.innerHTML = post.doc.type;
+            //alert(post.doc.type);
+            passOut(type); //I'm only passing out the type of the last post
+
+//          var url = URL.createObjectURL(blob);
+//          var posterImg = document.createElement("img");
+//          posterImg.src = url;
+//          liItem.appendChild(posterImg);
+
+            //var nextLink = $state.go('opportunities.post-detail', {postId: post.doc._id});
+            //var postContent = "<li onclick='" + nextLink + "'><img id='testonly' src='" + url + "'></li>" + ""; //ERROR: var postContent must be of type Node
+        }).catch(function (err) {
+            console.log(err);
+        });
+    }
+    function passOut(type) {
+        liItem.appendChild(type);
+    }
 */
+
 }]);
 
 
