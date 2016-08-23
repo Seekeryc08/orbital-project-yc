@@ -1,32 +1,108 @@
 <ion-view title='preferences-opptype'>
 	<ion-content>
-    <h4 style='text-align:center;'>Preferences</h4>
+
+<!-- Only show this if logged in-->
+<!--
+    <h4 style='text-align:center;'>My Favourites</h4>
+
+		<label class="item item-input item-text-wrap">
+      show favourites and let me display more than one line here
+		</label>
+		<div class="list">
+        <a class="item item-avatar" href="#">
+            <img src="img/groundupinitiative.png">
+            <h2>Ground Up Initiative</h2>
+            <p>Some description here...</p>
+        </a>
+    </div>
+-->
+
+
+    <h4 style='text-align:center;' id='mypreferences'>My Preferences</h4>
 
 		<label class="item item-input item-select">
-            <div class="input-label">
-              Display opportunities:
-            </div>
+				<div class='row item-text-wrap'>
+            Show opportunities
+            <!--
+            <img id='oppInfo' style='width:20px; height:20px; margin:0 auto;' src='img/info.png'>
+            -->
+        </div>
+        <div class='row'>
             <select id='oppType' onchange="changeOppTypeDisplay()">
               <option value='Work'>Work</option>
               <option value='Volunteer'>Volunteer</option>
+              <option value='favourites'>Favourites</option>
               <option value='all' selected>ALL</option>
             </select>
+        </div>
 		</label>
 
 
     <label class="item item-input item-select">
-        <div class="input-label">
-          Sort by:
+				<div class='row item-text-wrap'>
+            What is more important to you?
         </div>
-        <select>
-          <option></option>
-          <option selected>Proximity</option>
-        </select>
-
+        <div class='row'>
+            <select id='oppPref' onchange='changeOppPrefDisplay()'>
+              <option>Cash</option>
+              <option selected>Places near me</option>
+            </select>
+        </div>
     </label>
 
-    <h4 style='text-align:center; padding-top:20px;'>Profile</h4>
+    <label class="item item-input item-select">
+				<div class='row item-text-wrap'>
+            Preferred mode of travel
+        </div>
+        <div class='row'>
+            <select>
+              <option>Car</option>
+              <option>Walking</option>
+              <option selected>Public Transport</option>
+            </select>
+        </div>
+    </label>
 
+    <label class="item item-input item-select">
+				<div class='row item-text-wrap'>
+            More or less walking
+        </div>
+        <div class='row'>
+            <select>
+              <option>Less Walking</option>
+              <option selected>Normal</option>
+            </select>
+        </div>
+    </label>
+
+    <label class="item item-input item-select">
+				<div class='row item-text-wrap'>
+            Font size
+        </div>
+        <div class='row'>
+            <select>
+              <option>22px</option>
+              <option selected>16px</option>
+            </select>
+        </div>
+    </label>
+<!--
+    <label class="item item-input item-select">
+				<div class='row item-text-wrap'>
+            Location
+        </div>
+        <div class='row'>
+            <select id='oppLocation'>
+              <option selected>Use my current location</option>
+              <option>Use my home location</option>
+            </select>
+        </div>
+    </label>
+-->
+
+    <h4 style='text-align:center; padding-top:20px;'>My Profile</h4>
+<!--IF NOT LOGGED IN-->
+<!--
     <div class="card" id=''>
         <div class="item item-text-wrap">
 
@@ -46,7 +122,30 @@
             </div>
         </div>
     </div>
+-->
 
+<!--IF LOGGED IN-->
+
+		<div class="list">
+        <a class="item item-avatar" href="#">
+            <img src="img/dummy-profile-pic.png">
+            <h2>get name from database</h2>
+        </a>
+    </div>
+
+    <form id='saveUserAddress'>
+        <div class="list">
+            <label class="item item-input item-stacked-label">
+                <span class="input-label">My Address</span>
+                <input type="text" name='myaddress' placeholder="Enter a valid address">
+            </label>
+            <div class="row">
+                <div class="col text-center">
+                    <button id="" class="button button-positive">Save</button>
+                </div>
+            </div>
+        </div>
+    </form>
 
     </ion-content>
 </ion-view>

@@ -40,7 +40,7 @@
 
 #mainDeadline{
     display:none;
-    float:right;
+
 }
 
 #skillsBox {
@@ -51,6 +51,9 @@
 }
 
 .skills{
+    font-size:1em;
+}
+.directions{
     font-size:1em;
 }
 
@@ -139,6 +142,16 @@ a {
         <div class="main-title">
             {{docdetail.title}}
         </div>
+
+        <div class="main-datetime">
+            <span class="custom-iconbox">
+                <a class=""><!--allow user to add to their google calendar-->
+                    <i class="icon ion-calendar"></i>
+                </a>
+            </span>
+            {{docdetail.datetime}}
+        </div>
+
         <!--Link to org profile page
         <div class="main-orgname">
             <a href="">
@@ -152,17 +165,15 @@ a {
             </span>
             {{docdetail.address}}
         </div>
-        <div id="mainDeadline">
-            <div class='mainDeadlineLabel'>Closing On:</div>
-            {{docdetail.deadline}}
+<!--TESTING DIRECTIONS FEATURE-->
+        <div>
+            <button id='getDirections' class="button button-balanced button-small directions">
+            Get directions
+            </button>
         </div>
-        <div class="main-datetime">
-            <span class="custom-iconbox">
-                <a class=""><!--allow user to add to their google calendar-->
-                    <i class="icon ion-calendar"></i>
-                </a>
-            </span>
-            {{docdetail.datetime}}
+
+        <div id="mainDeadline">
+            <div class='mainDeadlineLabel'>Closing On: {{docdetail.deadline}}</div>
         </div>
 
     </div>

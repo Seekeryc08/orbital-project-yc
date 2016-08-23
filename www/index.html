@@ -11,7 +11,7 @@
     <script src="lib/ionic/js/ionic.bundle.js"></script>
     <script src="lib/pouchdb/dist/pouchdb.min.js"></script>
 
-    <script src="http://maps.googleapis.com/maps/api/js?key=AIzaSyA2u0eQNzCuDMdzG4opRM1ELacupQbzX28&sensor=true"></script>
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyA2u0eQNzCuDMdzG4opRM1ELacupQbzX28&sensor=true"></script>
 
     <!-- your app's js -->
     <!-- cordova script (this will be a 404 during development) -->
@@ -187,11 +187,11 @@ myMain.config(function($stateProvider, $urlRouterProvider, $ionicConfigProvider)
                   cordova.InAppBrowser.open('https://www.silverpages.sg/tools/e-care-locator', '_blank', 'location=yes');
               }
               document.getElementById('skillsFutureWeb').onclick=function(){
-                  cordova.InAppBrowser.open('http://www.skillsfuture.sg/programmes-and-initiatives.html', '_blank', 'location=yes');
+                  cordova.InAppBrowser.open('https://www.skillsfuture.sg/programmes-and-initiatives.html', '_blank', 'location=yes');
               }
 
               document.getElementById('skillsFutureWebST').onclick=function(){
-                  cordova.InAppBrowser.open('http://www.straitstimes.com/tags/skillsfuture', '_blank', 'location=yes');
+                  cordova.InAppBrowser.open('https://www.straitstimes.com/tags/skillsfuture', '_blank', 'location=yes');
               }
               onload();
         	}
@@ -334,7 +334,9 @@ myMain.config(function($stateProvider, $urlRouterProvider, $ionicConfigProvider)
                 /*
                 });
                 */
+                document.getElementById('getDirections').onclick=function() {
 
+                }
             }
         });
 
@@ -365,13 +367,18 @@ myMain.factory('posts', ['$http', function($http) {
   var factory = {};
 
   factory.all = function() {
-  var postsDB = dbpostings.allDocs({include_docs: true, attachments: true}).then(function(result) {
-      //do something with the result
-      //alert(result.rows);
-      return result.rows;
-  }).catch(function (err) {
-      console.log(err);
-  });
+      var postsDB = dbpostings.allDocs({include_docs: true, attachments: true}).then(function(result) {
+
+          var i=0;
+          var post = result.rows[i];
+          if(post.doc._id) {
+              //emit(post.doc.startdate); //ERR: emit is not defined
+          }
+
+          return result.rows;
+      }).catch(function (err) {
+          console.log(err);
+      });
 
     //or do db.getAttachment(doc,filename).then(function(blob) {}); here
     //for the total no. of docs
@@ -408,34 +415,57 @@ myMain.factory('posts', ['$http', function($http) {
     //return posts from dbpostings so that I could get the attachment data to insert
     //set attachments:true under dbpostings.get
 
-    return postsDB;
+      return postsDB;
   };
 
   return factory;
 }]);
 
 myMain.controller("OpportunitiesController", ['$scope', 'posts', '$state', function($scope, posts, $state) {
-  /*REFRESH ATTEMPT
-  $scope.doRefresh = function() {
 
-    $http.get('/new-items')
-     .success(function(newItems) {
-       //$scope.items = newItems;
-     })
-     .finally(function() {
-       // Stop the ion-refresher from spinning
-       $scope.$broadcast('scroll.refreshComplete');
-     });
+/*USING MAP/REDUCE FUNCTION AND QUERY(); CODE IS NOT WORKING*/
+/*
+    var ddoc = {
+      _id: 'newtest',
+      type: 'Work',
+      views: {
+        index: {
+          map: function mapFun(doc) {
+            if (doc.type) {
+              emit(doc.type);
+            }
+          }.toString()
+        }
+      }
 
-  };
-  */
-    //$scope.posts = posts;
-    //document.getElementById('listDisplay').style.paddingBottom = '30px';
+    }
+
+    dbpostings.put(ddoc).catch(function (err) {
+      if (err.name !== 'conflict') {
+        throw err;
+      }
+      // ignore if doc already exists
+    }).then(function () {
+
+      return dbpostings.query('index', {
+        key: 'Work',                                          //doc.type as emitted above
+                                                              //find docs with the type 'Work'
+        include_docs: true
+      });
+    }).then(function (result) {
+      alert(result);                             //this is returning dbpostings not remoteCouch cus not synced
+    }).catch(function (err) {
+      console.log(err);
+    });
+*/
 
 
     for(var i=0; i<posts.length; i++) {
 
         var post = posts[i];
+        if(post.doc._id) {
+            //emit(doc.startdate); ERR: emit is not defined
+        }
         var docId = post.doc._id;
 
         dbpostings.get(docId, {attachments:true}).then(function(doc) {
@@ -477,7 +507,18 @@ myMain.controller("OpportunitiesController", ['$scope', 'posts', '$state', funct
             type.innerHTML = doc.type;
             divDisplay.appendChild(type);
 
-
+/*
+                <div id="mainType">
+                    <img id="mainTypeImg">
+                </div>
+                if(docdetail.type == "Work") {
+                    document.getElementById('mainType').style.display = 'block';
+                    document.getElementById('mainTypeImg').src = "img/images.png";
+                } else if(docdetail.type == "Volunteer") {
+                    document.getElementById('mainType').style.display = 'block';
+                    document.getElementById('mainTypeImg').src = "img/helping-hands.jpg";
+                }
+*/
             //then append divDisplay to liItem.
             liItem.appendChild(divDisplay);
 
@@ -536,7 +577,98 @@ myMain.controller("OpportunitiesController", ['$scope', 'posts', '$state', funct
 
 
 myMain.controller("SettingsController", ['$scope', 'posts', function($scope, posts) {
+/*
+    document.getElementById('oppInfo').onclick=function() {
+        //alert('i want a helper window to show up');
+        document.getElementById('mypreferences').innerHTML = 'I have changed';
+    }
+*/
 
+    var dbmyaddress = new PouchDB('myaddress');
+    var remoteMyAddress = "http://localhost:5984/myaddress";
+
+    var myAddress = {};
+    function syncError() {console.log('Unable to sync to remote');}
+    function sync() {var opts = {live: true}; dbmyaddress.sync(remoteMyAddress, opts, syncError);}
+
+    //SAVE USER ADDRESS
+    saveAddress = function (event) {
+
+        dbmyaddress.get('myUserAddress').then(function(doc) {
+
+            //for Updating User address
+            dbmyaddress.put({
+              _id: 'myUserAddress',
+              _rev: doc._rev,
+              myaddress: document.getElementById('saveUserAddress').myaddress.value
+            });
+            if(remoteMyAddress) {
+              sync();
+            }
+            alert('Your address has been updated.');
+
+            //TALK TO MAPCTRL TO ASK FOR DISTANCE USING HOME ADDRESS
+            //2 scenarios:
+            //a. user preference set to 'use my current address'
+            //b. user preference set to 'use my home address'
+            //check if use my current location is selected
+            recalculateDistance = function() {
+                var oppLocation = document.getElementById("oppLocation");
+                var selectedValue = oppLocation.options[oppLocation.selectedIndex].value;
+                if(selectedValue == 'Use my current location') {
+                    alert("i'm going to return");
+                    return;
+                } else if(selectedValue == 'Use my home location') {
+                    alert("i'm going to use user's home location");
+                    //talk to MapCtrl to
+                    //(1) Input a new marker representing the home address
+                    //(2) re-calculate distance
+
+
+                }
+            }
+            recalculateDistance();
+
+        }).catch(function (err) {
+
+            //if User Address has never been keyed in
+            if (err.name === 'not_found') {
+                dbmyaddress.put({
+                    _id: 'myUserAddress',
+                    myaddress: document.getElementById('saveUserAddress').myaddress.value
+                });
+                if(remoteMyAddress) {
+                  sync();
+                }
+                alert('Your address has been saved.');
+
+                //TALK TO MAPCTRL TO ASK FOR DISTANCE USING HOME ADDRESS
+
+
+
+            } else { // hm, some other error
+                throw err;
+            }
+        });
+    };
+
+    document.getElementById('saveUserAddress').addEventListener('submit', saveAddress);
+
+
+
+$("#oppInfo").click(function(event){
+    event.preventDefault();
+    document.getElementById('mypreferences').innerHTML = 'I have changed';
+});
+
+    changeOppPrefDisplay = function() {
+        var oppPref = document.getElementById("oppPref");
+        var selectedValue = oppPref.options[oppPref.selectedIndex].value;
+        if(selectedValue == 'Cash') {
+            //order by More cash to less cash
+        }
+    }
+/*WORKING VERSION
     changeOppTypeDisplay = function(){
         var oppType = document.getElementById("oppType");
         var selectedValue = oppType.options[oppType.selectedIndex].value;
@@ -553,6 +685,10 @@ myMain.controller("SettingsController", ['$scope', 'posts', function($scope, pos
             }
             //alert(dbpostings.rows);
         });
+*/
+
+
+
 /*
         var postsOppType = dbpostings.allDocs({include_docs: true, attachments: true}).then(function(result) {
             return result.rows;
@@ -565,9 +701,9 @@ myMain.controller("SettingsController", ['$scope', 'posts', function($scope, pos
         //posts.all($scope.postsOppType);
 */
         //2. change $scope value of OpportunitiesController/MapCtrl from this controller
-
+/*
     };
-
+*/
 }]);
 
 //UNABLE TO PLACE ALL MY MAPS CODE IN TABS/MAP.JS
@@ -620,7 +756,9 @@ myMain.controller('MapCtrl', function($scope, Markers, $state) {
                   'message: ' + error.message + '\n');
         }
 
-        var options = {maximumAge: 0, timeout: 10000, enableHighAccuracy:true};
+        var options = {maximumAge: 0, timeout: 1000000, enableHighAccuracy:true};
+
+
         navigator.geolocation.getCurrentPosition(onSuccess, onError, options);
 
         google.maps.event.addListenerOnce($scope.map, 'idle', function(){
@@ -628,6 +766,21 @@ myMain.controller('MapCtrl', function($scope, Markers, $state) {
         });
 
 
+//TESTING:USE USER CURRENT LOCATION OR HOME ADDRESS
+        //IF USER CLICKS ON THE LOCATION OPTION, CALLS 'onchange' event
+        changeUserLocPref = function() {
+            var LocPref = document.getElementById("oppLocation");
+            var selectedValue = LocPref.options[LocPref.selectedIndex].value;
+
+            if(selectedValue == 'Use my current location') {
+                alert('I want to use my current location');
+                //navigator.geolocation.getCurrentPosition(onSuccess, onError, options);
+
+            } else if (selectedValue == 'Use my home location') {
+                alert('I want to use my home location');
+
+            }
+        }
 
         //2. loadMarkers - 4 parts
         //(a)find user's location and pass into next function
@@ -637,15 +790,20 @@ myMain.controller('MapCtrl', function($scope, Markers, $state) {
 
         function loadMarkers(){
             //2(a)
-            function onError(error) {alert('code: '    + error.code    + '\n' + 'message: ' + error.message + '\n');}
-            var options = {maximumAge: 0, timeout: 10000, enableHighAccuracy:true};
-            navigator.geolocation.getCurrentPosition(onSuccess, onError, options);
 
+            //if on settings tab, location is set to 'get my current location', do this
+            function onError(error) {alert('code: '    + error.code    + '\n' + 'message: ' + error.message + '\n');}
+            var options = {maximumAge: 0, timeout: 1000000, enableHighAccuracy:true};
+            navigator.geolocation.getCurrentPosition(onSuccess, onError, options);
             function onSuccess(position) {
                 var userLoc = new google.maps.LatLng(position.coords.latitude, position.coords.longitude);
                 //var userLoc = new google.maps.LatLng(1.3360910507988086, 103.91075134277344);
                 loadMarkers2(userLoc);
             }
+
+            //if on settings tab, location is set to 'get my home location', do this
+            //pass the reverse-geocoded value of the user's home location from settings pg into loadMarkers2
+
 
             //2(b)
             function loadMarkers2(userLoc) {
@@ -735,8 +893,7 @@ myMain.controller('MapCtrl', function($scope, Markers, $state) {
                             "</p><p id='infoWindowAddress'>" + record.doc.address +
                             "</p><p id='infoWindowType'>" + record.doc.type +
                             "</p><p id='infoWindowDatetime'>" + record.doc.datetime +
-                            "</p><p id='distanceReturned'>" + infoBubble.distance +
-                            "</p><p id='durationReturned'>" + infoBubble.duration +
+                            "</p><p id='distanceReturned'><b>" + infoBubble.distance + "</b> away <b>(" + infoBubble.duration + ")</b> via <b>Public Transport</b>" +
                             "</p>" +
                         "</div>" +
                     "</div>";
