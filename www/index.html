@@ -43,8 +43,13 @@
       #infoWindowDatetime  {
 
       }
-      #infoWindowType{
+      #infoWindowTypeVolunteer{
         float:right;
+        color:#FF8429;
+      }
+      #infoWindowTypeWork{
+        float:right;
+        color:#7700ff;
       }
       #infoWindowDeadline {
         float:right;
@@ -58,17 +63,37 @@
           height:120px;
           margin:0 auto;
           width:100%;
+
       }
       .listClass{
-          border: 1px solid grey;
-          margin:10px 10px;
+          /*border: 1px solid grey;*/
+          margin:15px 10px;
           border-radius:5px;
+          background-color:white;
       }
 
       .divDisplayClass {
-          padding: 0 10px 10px 10px;
+          padding: 0 10px 15px 10px;
+          background-color:white;
       }
-
+      .title-class{
+          font-weight:bold;
+      }
+      .org-class{
+          color:rgb(117, 82, 82);
+      }
+      .type-img-container{
+          float:right;
+          width:15%;
+      }
+      .type-img-class{
+          width:100%;
+          margin:0 auto;
+      }
+      .loc-img-class{
+          width:5%;
+          margin:0 auto;
+      }
       /*FOR SERVICES PG*/
       .card-desc {
           font-size:0.8em;
@@ -194,6 +219,7 @@ myMain.config(function($stateProvider, $urlRouterProvider, $ionicConfigProvider)
                   cordova.InAppBrowser.open('https://www.straitstimes.com/tags/skillsfuture', '_blank', 'location=yes');
               }
               onload();
+
         	}
         })
 
@@ -298,7 +324,7 @@ myMain.config(function($stateProvider, $urlRouterProvider, $ionicConfigProvider)
                     document.getElementById('mainTypeImg').src = "img/images.png";
                 } else if(docdetail.type == "Volunteer") {
                     document.getElementById('mainType').style.display = 'block';
-                    document.getElementById('mainTypeImg').src = "img/helping-hands.jpg";
+                    document.getElementById('mainTypeImg').src = "img/helping-hands.png";
                 }
                 dbpostings.getAttachment(docdetail._id, "filename").then(function(blob) {
                     var url = URL.createObjectURL(blob);
@@ -469,6 +495,7 @@ myMain.controller("OpportunitiesController", ['$scope', 'posts', '$state', funct
         var docId = post.doc._id;
 
         dbpostings.get(docId, {attachments:true}).then(function(doc) {
+
             var dataToPass = doc._attachments['filename'].data;
             var posterImg = document.createElement('img');
             posterImg.setAttribute('class', 'posterImgClass');
@@ -482,14 +509,30 @@ myMain.controller("OpportunitiesController", ['$scope', 'posts', '$state', funct
             var divDisplay = document.createElement('div');
             divDisplay.setAttribute('class', 'divDisplayClass');
 
+            //append the type img to divDisplay
+            var type = document.createElement('div');
+            type.setAttribute('class', 'type-img-container');
+            var typeImg = document.createElement('img');
+            if(doc.type == 'Work') {
+                typeImg.src = "img/images.png";
+                typeImg.setAttribute('class', 'type-img-class');
+            } else {
+                typeImg.src = "img/helping-hands.png";
+                typeImg.setAttribute('class', 'type-img-class');
+            }
+            type.appendChild(typeImg);
+            divDisplay.appendChild(type);
+
             //append the title to divDisplay.
             var title = document.createElement('div');
             title.innerHTML = doc.title;
+            title.setAttribute('class', 'title-class');
             divDisplay.appendChild(title);
 
             //append the orgName to divDisplay
             var orgName = document.createElement('div');
             orgName.innerHTML = doc.orgname;
+            orgName.setAttribute('class', 'org-class');
             divDisplay.appendChild(orgName);
 
             //append the dateTime to divDisplay
@@ -499,26 +542,20 @@ myMain.controller("OpportunitiesController", ['$scope', 'posts', '$state', funct
 
             //append the address to divDisplay
             var address = document.createElement('div');
-            address.innerHTML = doc.address;
+            var locImgContainer = document.createElement('span');
+            var locContainer = document.createElement('span');
+            var locImg = document.createElement('img');
+            locImg.src="img/loc.png";
+            locImg.setAttribute('class', 'loc-img-class');
+            locImgContainer.appendChild(locImg);
+            locContainer.appendChild(document.createTextNode(doc.address));
+
+            address.appendChild(locImgContainer);
+            address.appendChild(locContainer);
+
             divDisplay.appendChild(address);
 
-            //append the type to divDisplay
-            var type = document.createElement('div');
-            type.innerHTML = doc.type;
-            divDisplay.appendChild(type);
 
-/*
-                <div id="mainType">
-                    <img id="mainTypeImg">
-                </div>
-                if(docdetail.type == "Work") {
-                    document.getElementById('mainType').style.display = 'block';
-                    document.getElementById('mainTypeImg').src = "img/images.png";
-                } else if(docdetail.type == "Volunteer") {
-                    document.getElementById('mainType').style.display = 'block';
-                    document.getElementById('mainTypeImg').src = "img/helping-hands.jpg";
-                }
-*/
             //then append divDisplay to liItem.
             liItem.appendChild(divDisplay);
 
@@ -652,14 +689,10 @@ myMain.controller("SettingsController", ['$scope', 'posts', function($scope, pos
         });
     };
 
-    document.getElementById('saveUserAddress').addEventListener('submit', saveAddress);
+    //document.getElementById('saveUserAddress').addEventListener('submit', saveAddress);
 
 
 
-$("#oppInfo").click(function(event){
-    event.preventDefault();
-    document.getElementById('mypreferences').innerHTML = 'I have changed';
-});
 
     changeOppPrefDisplay = function() {
         var oppPref = document.getElementById("oppPref");
@@ -743,12 +776,18 @@ myMain.controller('MapCtrl', function($scope, Markers, $state) {
 
         //Get User's location
         var onSuccess = function(position) {
-          map.setCenter(new google.maps.LatLng(position.coords.latitude, position.coords.longitude));
-          var myLocation = new google.maps.Marker({
-            position: new google.maps.LatLng(position.coords.latitude, position.coords.longitude),
-            map: map,
-            title: "My Location"
-          });
+            map.setCenter(new google.maps.LatLng(position.coords.latitude, position.coords.longitude));
+            var myLocation = new google.maps.Marker({
+              position: new google.maps.LatLng(position.coords.latitude, position.coords.longitude),
+              map: map,
+              title: "My Location"
+            });
+            var infoWindow = new google.maps.InfoWindow({
+                content: "You are here!"
+            });
+            google.maps.event.addListener(myLocation, 'click', function () {
+                infoWindow.open($scope.map, myLocation);
+            });
         };
 
         function onError(error) {
@@ -766,12 +805,14 @@ myMain.controller('MapCtrl', function($scope, Markers, $state) {
         });
 
 
+
+
 //TESTING:USE USER CURRENT LOCATION OR HOME ADDRESS
         //IF USER CLICKS ON THE LOCATION OPTION, CALLS 'onchange' event
         changeUserLocPref = function() {
             var LocPref = document.getElementById("oppLocation");
             var selectedValue = LocPref.options[LocPref.selectedIndex].value;
-
+/*
             if(selectedValue == 'Use my current location') {
                 alert('I want to use my current location');
                 //navigator.geolocation.getCurrentPosition(onSuccess, onError, options);
@@ -780,6 +821,7 @@ myMain.controller('MapCtrl', function($scope, Markers, $state) {
                 alert('I want to use my home location');
 
             }
+*/
         }
 
         //2. loadMarkers - 4 parts
@@ -815,11 +857,28 @@ myMain.controller('MapCtrl', function($scope, Markers, $state) {
 
                         //2bii: Add the marker to the map
                         var markerPos = new google.maps.LatLng(record.doc.lat, record.doc.lng);
-                        var marker = new google.maps.Marker({
-                          map: map,
-                          animation: google.maps.Animation.DROP,
-                          position: markerPos //event.latLng?
-                        });
+                        var marker;
+                        var volunteerPinColor = "FF8429";
+                        var workPinColor = "7700ff";
+                        var workIcon = new google.maps.MarkerImage("http://chart.apis.google.com/chart?chst=d_map_pin_letter&chld=%E2%80%A2|" + workPinColor, new google.maps.Size(21, 34), new google.maps.Point(0,0), new google.maps.Point(10, 34));
+                        var volunteerIcon = new google.maps.MarkerImage("http://chart.apis.google.com/chart?chst=d_map_pin_letter&chld=%E2%80%A2|" + volunteerPinColor, new google.maps.Size(21, 34), new google.maps.Point(0,0), new google.maps.Point(10, 34));
+
+                        if(record.doc.type == "Work") {
+
+                            marker = new google.maps.Marker({
+                              map: map,
+                              animation: google.maps.Animation.DROP,
+                              icon: workIcon,
+                              position: markerPos //event.latLng?
+                            });
+                        } else {
+                            marker = new google.maps.Marker({
+                              map: map,
+                              animation: google.maps.Animation.DROP,
+                              icon: volunteerIcon,
+                              position: markerPos //event.latLng?
+                            });
+                        }
 
                         var destination = record.doc.address; //Notes: FOR G MAPS DISTANCE MATRIX - get the latlng value from database, from the particular doc. var destination = "(" + record.doc.lat + ", " + record.doc.lng + ")"; - FAILS: in property location: not a LatLng or LatLngLiteral: not an Object. var destination = "(1.3716722389317273, 103.88294219970703)"; - FAILS TOO; MUST BE CODED. //var destination = new google.maps.LatLng(record.doc.lat, record.doc.lng);
                         loadMarkers3(marker, destination, record);
@@ -884,19 +943,32 @@ myMain.controller('MapCtrl', function($scope, Markers, $state) {
                     distance: distance,
                     duration: duration
                 });
-                infoBubble.content =
-                    "<div id='infoBubble'>" +
-                        "<div id='content'>" +
-                            "<p id='infoWindowTitle'>" + record.doc.title +
-                            "</p><p id='infoWindowOrgname'>" + record.doc.orgname +
-                            "</p><p id='infoWindowDeadline'>" + record.doc.deadline +
-                            "</p><p id='infoWindowAddress'>" + record.doc.address +
-                            "</p><p id='infoWindowType'>" + record.doc.type +
-                            "</p><p id='infoWindowDatetime'>" + record.doc.datetime +
-                            "</p><p id='distanceReturned'><b>" + infoBubble.distance + "</b> away <b>(" + infoBubble.duration + ")</b> via <b>Public Transport</b>" +
-                            "</p>" +
-                        "</div>" +
-                    "</div>";
+                if(record.doc.type == "Work") {
+                    infoBubble.content =
+                        "<div id='infoBubble'>" +
+                            "<div id='content'>" +
+                                "<p id='infoWindowTitle'>" + record.doc.title +
+                                "</p><p id='infoWindowOrgname'>" + record.doc.orgname +
+                                "</p><p id='infoWindowAddress'>" + record.doc.address +
+                                "</p><p id='infoWindowTypeWork'>" + record.doc.type +
+                                "</p><p id='distanceReturned'><b>" + infoBubble.distance + "</b> away <b>(" + infoBubble.duration + ")</b> via <b>Public Transport</b>" +
+                                "</p>" +
+                            "</div>" +
+                        "</div>";
+                } else {
+                    infoBubble.content =
+                        "<div id='infoBubble'>" +
+                            "<div id='content'>" +
+                                "<p id='infoWindowTitle'>" + record.doc.title +
+                                "</p><p id='infoWindowOrgname'>" + record.doc.orgname +
+                                "</p><p id='infoWindowAddress'>" + record.doc.address +
+                                "</p><p id='infoWindowTypeVolunteer'>" + record.doc.type +
+                                "</p><p id='distanceReturned'><b>" + infoBubble.distance + "</b> away <b>(" + infoBubble.duration + ")</b> via <b>Public Transport</b>" +
+                                "</p>" +
+                            "</div>" +
+                        "</div>";
+
+                }
 
                 google.maps.event.addListener(marker, 'click', function() {
                     //alert(marker.position);

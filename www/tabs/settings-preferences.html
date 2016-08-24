@@ -1,3 +1,9 @@
+<style>
+.spare{
+    padding: 30px 0;
+}
+</style>
+
 <ion-view title='preferences-opptype'>
 	<ion-content>
 
@@ -31,13 +37,15 @@
             <select id='oppType' onchange="changeOppTypeDisplay()">
               <option value='Work'>Work</option>
               <option value='Volunteer'>Volunteer</option>
+<!--
               <option value='favourites'>Favourites</option>
+-->
               <option value='all' selected>ALL</option>
             </select>
         </div>
 		</label>
 
-
+<!--
     <label class="item item-input item-select">
 				<div class='row item-text-wrap'>
             What is more important to you?
@@ -49,7 +57,7 @@
             </select>
         </div>
     </label>
-
+-->
     <label class="item item-input item-select">
 				<div class='row item-text-wrap'>
             Preferred mode of travel
@@ -62,7 +70,7 @@
             </select>
         </div>
     </label>
-
+<!--
     <label class="item item-input item-select">
 				<div class='row item-text-wrap'>
             More or less walking
@@ -86,6 +94,7 @@
             </select>
         </div>
     </label>
+-->
 <!--
     <label class="item item-input item-select">
 				<div class='row item-text-wrap'>
@@ -101,8 +110,8 @@
 -->
 
     <h4 style='text-align:center; padding-top:20px;'>My Profile</h4>
+
 <!--IF NOT LOGGED IN-->
-<!--
     <div class="card" id=''>
         <div class="item item-text-wrap">
 
@@ -117,15 +126,15 @@
 
             <div class='row'>
                 <div class='col'>
-                    <button class="button button-small button-positive">Log In</button>
+                    <button class="button button-small button-block button-positive">Log In</button>
                 </div>
             </div>
         </div>
     </div>
--->
+
 
 <!--IF LOGGED IN-->
-
+<!--
 		<div class="list">
         <a class="item item-avatar" href="#">
             <img src="img/dummy-profile-pic.png">
@@ -146,6 +155,8 @@
             </div>
         </div>
     </form>
+-->
+    <div class='spare'></div>
 
     </ion-content>
 </ion-view>

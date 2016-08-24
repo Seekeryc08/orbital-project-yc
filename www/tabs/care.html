@@ -1,14 +1,38 @@
+<style>
+#careBackground{
+    background-color: #000000;
+}
+h4{
+    color:white;
+    text-align:center;
+}
+.card-desc{
+    /*padding-bottom:10px;*/
+}
+.spare{
+    padding: 25px;
+}
+.card{
+    margin-top:0;
+    padding-top:0;
+}
+.desc-style{
+    color:black;
+    text-align:justify;
+}
+</style>
+
       <ion-header-bar class="bar-stable">
           <h1 class="title">Services</h1>
       </ion-header-bar>
 
-      <ion-content>
+      <ion-content id='careBackground'>
 <!--CARE SERVICES-->
-          <h4 style='text-align:center;'>Care Services</h4>
+          <h4 class=''>Care Services</h4>
           <div class="card" id=''>
               <div class="item item-text-wrap">
                   <div class='row'>
-                      <div class='col-50 col-offset-25'>
+                      <div class='col'>
                           <img src='img/silvercare.png' style='width:100%; margin:0 auto;'>
                       </div>
                   </div>
@@ -18,28 +42,28 @@
                   </div>
                   <div class="row">
                       <div class="col">
-                          <p class='card-desc' style='text-align:justify;'>
+                          <p class='desc-style'>
                               Eligible seniors can apply for subsidised care services by getting their Medical Social Workers, attending doctors or Social Workers to help put up a referral and application to Agency For Integrated Care (AIC). The referral team at AIC will then get in touch with some recommendations based on what you need.
                           </p>
                       </div>
                   </div>
                   <div class='row'>
-                      <div class='col-50 col-offset-25'>
+                      <div class='col'>
                           <img src='img/silvercare2.png' style='width:100%; margin:0 auto;'>
                       </div>
                   </div>
                   <div class="row">
                       <div class="col">
-                          <p class='card-desc' style='text-align:justify;'>
+                          <p class='desc-style' style='text-align:justify;'>
                               You can use the E-care Locator to find out more about services near you and share your preferences during the application process.
                           </p>
                       </div>
                   </div>
 
                   <div class='row'>
-                      <div class='col' style=''>
+                      <div class='col'>
 <!--Open Web Url-->
-                          <button id="eCare" class="button button-small button-positive">Find Care Nearby</button>
+                          <button id="eCare" class="button button-block button-small button-positive">Find Care Nearby</button>
                       </div>
                   </div>
               </div>
@@ -54,7 +78,7 @@
           <div class="card" id='education'>
               <div class="item item-text-wrap">
                   <div class='row'>
-                      <div class='col-50 col-offset-25'>
+                      <div class='col'>
                           <img src='img/skillsfuture.png' style='width:100%; margin:0 auto;'>
                       </div>
                   </div>
@@ -64,7 +88,7 @@
                   </div>
                   <div class="row">
                       <div class="col">
-                          <p class='card-desc' style='text-align:justify;'>
+                          <p class='desc-style' style='text-align:justify;'>
                               SkillsFuture is a national movement to enable all Singaporeans to develop to their fullest potential throughout life. Whichever stage of life you are in, whether you are in your schooling years, early career, mid-career or silver years, SkillsFuture will enable you to take advantage of a wide range of opportunities – to help you realise your aspirations and attain mastery of skills.
                           </p>
                       </div>
@@ -73,7 +97,7 @@
                   <div class='row'>
                       <div class='col' style=''>
 <!--Open Web Url-->
-                          <button id="skillsFutureWeb" class="button button-small button-positive">Learn More</button>
+                          <button id="skillsFutureWeb" class="button button-small button-block button-positive">Learn More</button>
                       </div>
                   </div>
 
@@ -85,18 +109,20 @@
                   </div>
                   <div class="row">
                       <div class="col">
-                          <p class='card-desc' style='text-align:justify;'>
+                          <p class='desc-style' style='text-align:justify;'>
                               Find the latest SkillsFuture news and updates here.
                           </p>
                       </div>
                   </div>
                   <div class='row'>
                       <div class='col' style=''>
-                          <button id="skillsFutureWebST" class="button button-small button-positive" style=''>Read</button>
+                          <button id="skillsFutureWebST" class="button button-block button-small button-positive" style=''>Read</button>
                       </div>
                   </div>
 
               </div>
           </div>
+
+          <div class='spare'></div>
 
       </ion-content>
